@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { View, ScrollView, StyleSheet, Image, ActivityIndicator } from 'react-native';
-import { Text, Card } from '@rneui/themed';
+import { Card, Text } from '@rneui/themed';
 import axios from 'axios';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, Image, ScrollView, StyleSheet, View } from 'react-native';
 
 type Loja = {
   id: number;
@@ -14,7 +14,7 @@ type Loja = {
 type Categoria = {
   id: number;
   nome: string;
-  imagem: string
+  imagemUrl: string
   
 };
 
@@ -120,7 +120,7 @@ export default function Principal() {
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           {Array.isArray(categorias) && categorias.map((c) => (
             <View key={c.id} style={styles.cardLoja}>
-              <Image source={{ uri: c.imagem }} style={styles.logo} resizeMode="cover" />
+              <Image source={{ uri: c.imagemUrl }} style={styles.logo} resizeMode="cover" />
               <Text style={styles.nomeLoja}>{c.nome}</Text>
             </View>
           ))}

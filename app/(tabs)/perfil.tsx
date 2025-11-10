@@ -1,36 +1,34 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, ActivityIndicator, StyleSheet, Alert } from "react-native";
-import { Avatar, Button, Card } from "@rneui/themed";
+import { Avatar, Button, Card, Icon, ListItem } from "@rneui/themed";
 import axios from "axios";
-import { ListItem } from '@rneui/themed';
-import { Icon } from "@rneui/themed";
+import React, { useEffect, useState } from "react";
+import { ActivityIndicator, Alert, StyleSheet, Text, View } from "react-native";
 
 
 export default function Perfil() {
-  const [user, setUser] = useState<{ name: string; email: string; avatar: string } | null>(null);
+  const [user, setUser] = useState<{ nome: string; email: string;  } | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function carregarPerfil() {
       try {
-        //  API:
-        // const token = "seu_token_aqui";
-        // const response = await axios.get("https://suaapi.com/profile", {
-        //   headers: { Authorization: `Bearer ${token}` },
-        // });
-        // const data = response.data.user;
+  
+       const token = "seu_token_aqui";
+         const response = await axios.get("http://localhost:8000/perfil/2", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+         const data = response.data;
 
-        // Exemplo sem token (API pública do Random User) remover depois
-        const response = await axios.get("https://randomuser.me/api/");
-        const data = response.data.results[0]; // acessa o primeiro usuário retornado
+         console.log(data)
+
+
 
 
 
         // Define o usuário com base nos dados da API
         setUser({
-          name: `${data.name.first} ${data.name.last}`,
-          email: data.email,
-          avatar: data.picture.large,
+          nome: `${data.nome}`,
+          email: data.email
+          
         });
       } catch (error) {
         console.error("Erro ao carregar perfil:", error);
@@ -67,10 +65,10 @@ export default function Perfil() {
           <Avatar
             size={100}
             rounded
-            source={{ uri: user.avatar }}
+            
             containerStyle={{ marginBottom: 15 }}
           />
-          <Text style={styles.name}>{user.name}</Text>
+          <Text style={styles.name}>{user.nome}</Text>
           <Text style={styles.email}>{user.email}</Text>
         </View>
 
