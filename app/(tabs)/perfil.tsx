@@ -8,6 +8,7 @@ export default function Perfil() {
   const [user, setUser] = useState<{ nome: string; email: string;  } | null>(null);
   const [loading, setLoading] = useState(true);
 
+
   useEffect(() => {
     async function carregarPerfil() {
       try {
@@ -21,7 +22,10 @@ export default function Perfil() {
          console.log(data)
 
 
-
+  // const handleLogout = async () => {
+  //   await AsyncStorage.clear();
+  //   router.replace("/auth/login");
+  // };
 
 
         // Define o usuário com base nos dados da API
