@@ -68,21 +68,57 @@ export default function Login() {
         onPress={handleLogin}
       />
 
-      <Text style={styles.linkText}>
-        Ainda não tem conta?{' '}
-        <Link href="/cadastro" style={styles.link}>
-          Cadastre-se
+<View style={styles.linksContainer}>
+        <Link href="/esqueceuSenha" style={styles.linkSenha}>
+          Esqueceu sua senha?
         </Link>
-      </Text>
+
+        <Text style={styles.linkText}>
+          Ainda não tem conta?{' '}
+          <Link href="/cadastro" style={styles.link}>
+            Cadastre-se
+          </Link>
+        </Text>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', padding: 24, backgroundColor: '#fff' },
-  title: { textAlign: 'center', marginBottom: 32 },
-  button: { backgroundColor: '#E60014', borderRadius: 8, paddingVertical: 12 },
-  linkText: { textAlign: 'center', marginTop: 16 },
-  link: { color: '#E60014', fontWeight: 'bold' },
-  error: { color: 'red', textAlign: 'center', marginBottom: 10 },
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    padding: 24,
+    backgroundColor: '#fff',
+  },
+  title: {
+    textAlign: 'center',
+    marginBottom: 32,
+  },
+  button: {
+    backgroundColor: '#E60014',
+    borderRadius: 8,
+    paddingVertical: 12,
+  },
+  error: {
+    color: 'red',
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+  linksContainer: {
+    alignItems: 'center', // centraliza horizontalmente
+    marginTop: 20,        // espaço entre o botão e os links
+  },
+  linkSenha: {
+    color: '#E60014',
+    fontWeight: 'bold',
+    marginBottom: 10,     // espaço entre os dois links
+  },
+  linkText: {
+    textAlign: 'center',
+  },
+  link: {
+    color: '#E60014',
+    fontWeight: 'bold',
+  },
 });
