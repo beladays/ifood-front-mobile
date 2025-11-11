@@ -1,22 +1,30 @@
 import React, { useState, useEffect } from "react";
-import { View, TextInput, StyleSheet, Alert, ActivityIndicator } from "react-native";
-import { Button, Card } from "@rneui/themed";
+import {
+  View,
+  TextInput,
+  StyleSheet,
+  Alert,
+  ActivityIndicator,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+} from "react-native";
+import { Button, Card, Icon } from "@rneui/themed";
 import axios from "axios";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+
 export default function DadosConta() {
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
-  // 🔹 Buscar dados do usuário
   useEffect(() => {
     async function carregarDados() {
       try {
-        const token = await AsyncStorage.getItem("token"); // 🔑 Recupera o token salvo
-
-        const response = await axios.get("http://localhost:8000/perfil/", {
+        const token = await AsyncStorage.getItem("token");
+        const response = await axios.get("http://localhost:8000/perfil", {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -33,10 +41,9 @@ export default function DadosConta() {
     carregarDados();
   }, []);
 
-  //  Atualizar dados do usuário
-  const handleUpdate = async () => {
+  const editar = async () => {
     try {
-      const token = ""; // 
+      const token = "";
       await axios.patch(
         "http://localhost:8000/perfil",
         { nome, email },
@@ -44,15 +51,14 @@ export default function DadosConta() {
       );
 
       Alert.alert("Sucesso", "Dados atualizados com sucesso!");
-      router.back(); 
+      router.back();
     } catch (error) {
       console.error("Erro ao atualizar:", error);
       Alert.alert("Erro", "Não foi possível atualizar os dados.");
     }
   };
 
-  // 🔹 Excluir conta
-  const handleDeleteAccount = () => {
+  const deletar = () => {
     Alert.alert(
       "Excluir conta",
       "Tem certeza que deseja excluir sua conta? Essa ação não pode ser desfeita.",
@@ -83,58 +89,153 @@ export default function DadosConta() {
   if (loading) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator size="large" color="#E91E63" />
+        <ActivityIndicator size="large" color="#d32f2f" />
       </View>
     );
   }
 
   return (
     <View style={styles.container}>
-      <Card containerStyle={styles.card}>
-        <Card.Title>Editar Dados da Conta</Card.Title>
-        <Card.Divider />
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => router.push("/(tabs)/perfil")} style={styles.backButton}>
+          <Icon name="arrow-back-ios" type="material" color="#d32f2f" size={22} />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Minha Conta</Text>
+        <View style={{ width: 40 }} /> 
+      </View>
 
-        <TextInput
-          style={styles.input}
-          placeholder="Nome"
-          value={nome}
-          onChangeText={setNome}
-        />
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <View style={styles.avatarContainer}>
+          <View style={styles.avatarCircle}>
+            <Text style={styles.avatarText}>{nome?.[0]?.toUpperCase() || ""}</Text>
+          </View>
+        </View>
 
-        <TextInput
-          style={styles.input}
-          placeholder="E-mail"
-          value={email}
-          onChangeText={setEmail}
-        />
+        <Card containerStyle={styles.card}>
+          <Text style={styles.label}>Nome</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Seu nome"
+            value={nome}
+            onChangeText={setNome}
+            placeholderTextColor="#999"
+          />
 
-        <Button
-          title="Salvar Alterações"
-          onPress={handleUpdate}
-          buttonStyle={{ backgroundColor: "#2196F3", borderRadius: 8 }}
-          containerStyle={{ marginTop: 15 }}
-        />
+          <Text style={styles.label}>E-mail</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Seu e-mail"
+            value={email}
+            onChangeText={setEmail}
+            keyboardType="email-address"
+            placeholderTextColor="#999"
+          />
 
-        <Button
-          title="Excluir Conta"
-          onPress={handleDeleteAccount}
-          buttonStyle={{ backgroundColor: "#D32F2F", borderRadius: 8 }}
-          containerStyle={{ marginTop: 10 }}
-        />
-      </Card>
+          <Button
+            title="Salvar alterações"
+            onPress={editar}
+            buttonStyle={styles.saveButton}
+            titleStyle={styles.saveTitle}
+            containerStyle={{ marginTop: 20 }}
+          />
+
+          <Button
+            title="Excluir conta"
+            onPress={deletar}
+            buttonStyle={styles.deleteButton}
+            titleStyle={styles.deleteTitle}
+            containerStyle={{ marginTop: 10 }}
+          />
+        </Card>
+      </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff", padding: 16 },
-  card: { borderRadius: 10, elevation: 3 },
+  container: {
+    flex: 1,
+    backgroundColor: "#fafafa",
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingTop: 50,
+    paddingHorizontal: 16,
+    paddingBottom: 10,
+    backgroundColor: "#fff",
+    borderBottomWidth: 1,
+    borderBottomColor: "#eee",
+    elevation: 2,
+  },
+  backButton: {
+    padding: 5,
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#d32f2f",
+  },
+  avatarContainer: {
+    alignItems: "center",
+    marginTop: 30,
+    marginBottom: 15,
+  },
+  avatarCircle: {
+    width: 90,
+    height: 90,
+    borderRadius: 45,
+    backgroundColor: "#fde4e4",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  avatarText: {
+    fontSize: 36,
+    fontWeight: "bold",
+    color: "#d32f2f",
+  },
+  card: {
+    borderRadius: 16,
+    padding: 20,
+    backgroundColor: "#fff",
+    elevation: 3,
+    marginHorizontal: 10,
+  },
+  label: {
+    fontSize: 14,
+    color: "#666",
+    marginBottom: 6,
+    marginTop: 10,
+  },
   input: {
     borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 8,
-    padding: 10,
-    marginBottom: 15,
+    borderColor: "#eee",
+    borderRadius: 10,
+    padding: 12,
+    backgroundColor: "#f9f9f9",
+    fontSize: 16,
+  },
+  saveButton: {
+    backgroundColor: "#d32f2f",
+    borderRadius: 10,
+    paddingVertical: 14,
+  },
+  saveTitle: {
+    fontWeight: "bold",
+    fontSize: 16,
+  },
+  deleteButton: {
+    backgroundColor: "#fff",
+    borderWidth: 1,
+    borderColor: "#d32f2f",
+    borderRadius: 10,
+    paddingVertical: 14,
+  },
+  deleteTitle: {
+    color: "#d32f2f",
+    fontWeight: "bold",
+    fontSize: 16,
   },
   center: { flex: 1, justifyContent: "center", alignItems: "center" },
 });
