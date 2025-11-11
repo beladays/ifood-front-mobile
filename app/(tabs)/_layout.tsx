@@ -46,6 +46,16 @@ export default function TabLayout() {
        
         }}
       />
+
+        <Tabs.Screen
+        name="pedidos"
+        options={{
+          title: 'Pedidos',
+          tabBarIcon: ({ color }) => (
+            <Icon name="newspaper" type="material" color={color} size={26} /> // ✅ corrigido
+          ),
+        }}
+      />
     </Tabs>
   );
 }
