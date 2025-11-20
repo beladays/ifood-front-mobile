@@ -1,8 +1,8 @@
 import { Avatar, Button, Card, Icon, ListItem } from "@rneui/themed";
 import axios from "axios";
+import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from "react";
 import { ActivityIndicator, Alert, StyleSheet, Text, View } from "react-native";
-import { useRouter } from 'expo-router';
 
 export default function Perfil() {
   const [user, setUser] = useState<{ nome: string; email: string; } | null>(null);
@@ -14,21 +14,14 @@ export default function Perfil() {
   useEffect(() => {
     async function carregarPerfil() {
       try {
-
-        const token = "";
-        const response = await axios.get("http://localhost:8000/perfil/1", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+      const token = localStorage.getItem("token");
+      const response = await axios.get("http://localhost:8000/perfil", {
+        headers: {Authorization: `Bearer ${token}`,
+        },
+      });
         const data = response.data;
 
         console.log(data)
-
-
-        // const handleLogout = async () => {
-        //   await AsyncStorage.clear();
-        //   router.replace("/auth/login");
-        // };
-
 
         // Define o usuário com base nos dados da API
         setUser({
@@ -113,7 +106,10 @@ export default function Perfil() {
 
         <Button
           title="Sair"
-          onPress={() => Alert.alert("Logout realizado!")}
+          onPress={() => {
+            localStorage.removeItem("token");
+            router.replace('/login');
+          }}
           buttonStyle={{ backgroundColor: "#E91E63", borderRadius: 8, width: 200 }}
           containerStyle={{ marginTop: 20, alignItems: "center" }}
         />
