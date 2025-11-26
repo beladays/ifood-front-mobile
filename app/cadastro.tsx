@@ -8,39 +8,81 @@ export default function Cadastro() {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
+  const [confirmarSenha, setConfirmarSenha] = useState('');
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState('');
   const [sucesso, setSucesso] = useState('');
   const router = useRouter();
 
-  const handleCadastro = async () => {
-    setErro('');
-    setSucesso('');
-    setLoading(true);
-
-    try {
-      const response = await axios.post('http://localhost:8000/auth/register', {
-        username,
-        email,
-        password: senha,
-      });
-
-      console.log('Usuário cadastrado:', response.data);
-
-      setSucesso('Cadastro realizado com sucesso!');
-      
-      // Opcional: aguarda 1s e redireciona pro login
-      setTimeout(() => {
-        router.push('/login');
-      }, 1000);
-
-    } catch (err: any) {
-      console.log(err.response?.data || err.message);
-      setErro(err.response?.data?.message || 'Erro ao cadastrar usuário');
-    } finally {
-      setLoading(false);
-    }
+  //tem q ter @
+  const validarEmail = (email: string) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
   };
+
+  // Mínimo 8 caracteres, 1 maiúscula, 1 número e 1 símbolo
+  const validarSenha = (senha: string) => {
+    const regex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/;
+    return regex.test(senha);
+  };
+const handleCadastro = async () => {
+  setErro('');
+  setSucesso('');
+
+  // remove espaços extras
+  const usernameTrim = username.trim();
+  const emailTrim = email.trim();
+
+  // n pode enviar campos vazios
+  if (!usernameTrim || !emailTrim || !senha || !confirmarSenha) {
+    setErro('Preencha todos os campos.');
+    return;
+  }
+
+  // email so com @
+  if (!validarEmail(emailTrim)) {
+    setErro('Insira um email válido (ex: nome@email.com).');
+    return;
+  }
+
+  // campo de senha e confimar senha tem q ser iguais
+  if (senha !== confirmarSenha) {
+    setErro('As senhas não são iguais.');
+    return;
+  }
+
+  // n pode senha fraca
+  if (!validarSenha(senha)) {
+    setErro('Senha fraca: mínimo 8 caracteres, 1 maiúscula, 1 número e 1 símbolo.');
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    await axios.post('http://localhost:8000/auth/register', {
+      username: usernameTrim,
+      email: emailTrim,
+      password: senha,
+    });
+
+    setSucesso('Cadastro realizado com sucesso!');
+
+    setTimeout(() => {
+      router.push('/login');
+    }, 1000);
+
+  } catch (err: any) {
+    if (err.response?.status === 409) {
+      setErro('Usuário ou email já existe.');
+    } else {
+      setErro('Erro ao cadastrar usuário. Verifique os dados.');
+    }
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <View style={styles.container}>
@@ -64,6 +106,13 @@ export default function Cadastro() {
         placeholder="Senha"
         value={senha}
         onChangeText={setSenha}
+        secureTextEntry
+      />
+
+      <Input
+        placeholder="Confirmar senha"
+        value={confirmarSenha}
+        onChangeText={setConfirmarSenha}
         secureTextEntry
       />
 
