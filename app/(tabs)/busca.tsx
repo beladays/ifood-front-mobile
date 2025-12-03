@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { SearchBar } from '@rneui/themed';
 import {
   View,
@@ -22,13 +23,15 @@ export default function Busca() {
   const [loading, setLoading] = useState(true);
   const updateSearch = (text: string) => setSearch(text);
 
-//chamar API
-    useEffect(() => {
+  // chamar API 
+  useEffect(() => {
     async function fetchCategorias() {
       try {
-        const response = await fetch('http://localhost:8081/categorias/restaurantes');
-        const data = await response.json();
-        setCategorias(data); 
+        const response = await axios.get(
+          'http://localhost:8081/categorias/restaurantes'
+        );
+
+        setCategorias(response.data); 
       } catch (error) {
         console.error('Erro ao buscar categorias:', error);
       } finally {
@@ -39,14 +42,13 @@ export default function Busca() {
     fetchCategorias();
   }, []);
 
-
   // Filtra categorias por nome
   const categoriasFiltradas = categorias.filter((c) =>
     c.nome.toLowerCase().includes(search.toLowerCase())
   );
 
   const screenWidth = Dimensions.get('window').width;
-  const cardWidth = (screenWidth - 30) / 2; // margem/padding
+  const cardWidth = (screenWidth - 30) / 2;
 
   const renderItem = ({ item }: { item: Categoria }) => (
     <TouchableOpacity style={[styles.card, { width: cardWidth }]}>
