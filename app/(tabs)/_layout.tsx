@@ -2,8 +2,6 @@ import { Tabs } from 'expo-router';
 import React from 'react';
 import { Icon } from '@rneui/themed';
 import { HapticTab } from '@/components/haptic-tab';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
 export default function TabLayout() {
@@ -12,42 +10,45 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+       // tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
         headerShown: false,
         tabBarButton: HapticTab,
+        tabBarActiveTintColor: "#000000ff",     // ativo
+        tabBarInactiveTintColor: "#666666",   // inativo
+
       }}>
       <Tabs.Screen
         name="index"
         options={{
           title: 'Home',
           tabBarIcon: ({ color }) => (
-                <Icon name="home" type="material" color={color} size={26} />
-          ), 
+            <Icon name="home" type="material" color={color} size={26} />
+          ),
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="busca"
         options={{
           title: 'Busca',
-          tabBarIcon: ({ color }) =>(
-                <Icon name= "search" type="feather" color={color} size={26} />
-          ), 
-         
+          tabBarIcon: ({ color }) => (
+            <Icon name="search" type="feather" color={color} size={26} />
+          ),
+
         }}
       />
 
-       <Tabs.Screen
+      <Tabs.Screen
         name="perfil"
         options={{
           title: 'Perfil',
           tabBarIcon: ({ color }) => (
-                <Icon name= "user" type="font-awesome" color={color} size={26} />
-          ), 
-       
+            <Icon name="user" type="font-awesome" color={color} size={26} />
+          ),
+
         }}
       />
 
-        <Tabs.Screen
+      <Tabs.Screen
         name="pedidos"
         options={{
           title: 'Pedidos',
