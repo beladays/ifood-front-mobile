@@ -15,7 +15,7 @@ export default function Perfil() {
     async function carregarPerfil() {
       try {
       const token = localStorage.getItem("token");
-      const response = await axios.get("http://localhost:8000/perfil", {
+      const response = await axios.get("http://localhost:8081/perfil", {
         headers: {Authorization: `Bearer ${token}`,
         },
       });

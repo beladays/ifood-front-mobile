@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { View, StyleSheet } from 'react-native';
-import { Input, Button, Text } from '@rneui/themed';
+import { Button, Input, Text } from '@rneui/themed';
 import axios from 'axios';
 import { Link, useRouter } from 'expo-router';
+import React, { useState } from 'react';
+import { StyleSheet, View } from 'react-native';
 
 export default function Cadastro() {
   const [username, setUsername] = useState('');
@@ -19,7 +19,7 @@ export default function Cadastro() {
     setLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:8000/auth/register', {
+      const response = await axios.post('http://localhost:8081/auth/registro', {
         username,
         email,
         password: senha,

@@ -25,25 +25,35 @@ export default function Principal() {
   const [categorias, setCategorias] = useState<Categoria[]>([]);
 
   // Carregar lojas
-  useEffect(() => {
-    async function carregarLojas() {
-      try {
-        const response = await axios.get('http://localhost:8000/restaurante'); // coloque sua URL da API aqui
-        console.log('Resposta lojas:', response.data);
+useEffect(() => {
+  async function carregarLojas() {
+    try {
+      const token = localStorage.getItem("token");
 
-        // Garante que é um array antes de salvar
-        const dados = Array.isArray(response.data)
-          ? response.data
-          : response.data.lojas || [];
+      const response = await axios.get(
+        "http://localhost:8081/restaurante",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          }
+        }
+      );
 
-        setLojas(dados);
-      } catch (error) {
-        console.error('Erro ao carregar lojas:', error);
-      }
+      console.log("Resposta lojas:", response.data);
+
+      const dados = Array.isArray(response.data)
+        ? response.data
+        : response.data.lojas || [];
+
+      setLojas(dados);
+    } catch (error) {
+      console.error("Erro ao carregar lojas:", error);
     }
+  }
 
-    carregarLojas();
-  }, []);
+  carregarLojas();
+}, []);
+
 
   // Card de desconto
   useEffect(() => {
@@ -62,24 +72,35 @@ export default function Principal() {
   }, []);
 
   // Carregar categorias
-  useEffect(() => {
-    async function carregarCategorias() {
-      try {
-        const response = await axios.get('http://localhost:8000/categoria'); // API 
-        console.log('Resposta categorias:', response.data);
+ useEffect(() => {
+  async function carregarCategorias() {
+    try {
+      const token = localStorage.getItem("token"); // ou AsyncStorage no mobile
 
-        const dados = Array.isArray(response.data)
-          ? response.data
-          : response.data.categorias || [];
+      const response = await axios.get(
+        "http://localhost:8081/categorias/restaurantes",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
 
-        setCategorias(dados);
-      } catch (error) {
-        console.error('Erro ao carregar categorias:', error);
-      }
+      console.log("Resposta categorias:", response.data);
+
+      const dados = Array.isArray(response.data)
+        ? response.data
+        : response.data.categorias || [];
+
+      setCategorias(dados);
+    } catch (error) {
+      console.error("Erro ao carregar categorias:", error);
     }
+  }
 
-    carregarCategorias();
-  }, []);
+  carregarCategorias();
+}, []);
+
 
   return (
     <ScrollView style={{ flex: 1 }}>

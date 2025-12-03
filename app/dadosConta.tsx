@@ -1,18 +1,18 @@
-import React, { useState, useEffect } from "react";
-import {
-  View,
-  TextInput,
-  StyleSheet,
-  Alert,
-  ActivityIndicator,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-} from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Button, Card, Icon } from "@rneui/themed";
 import axios from "axios";
 import { useRouter } from "expo-router";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import React, { useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  Alert,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 export default function DadosConta() {
   const [nome, setNome] = useState("");
@@ -24,10 +24,10 @@ export default function DadosConta() {
     async function carregarDados() {
       try {
         const token = await AsyncStorage.getItem("token");
-        const response = await axios.get("http://localhost:8000/perfil", {
+        const response = await axios.get("http://localhost:8081/perfil", {
           headers: { Authorization: `Bearer ${token}` },
         });
-
+       
         setNome(response.data.nome);
         setEmail(response.data.email);
       } catch (error) {
@@ -43,9 +43,9 @@ export default function DadosConta() {
 
   const editar = async () => {
     try {
-      const token = "";
+      const token = await AsyncStorage.getItem("token");
       await axios.patch(
-        "http://localhost:8000/perfil",
+        "http://localhost:8081/perfil",
         { nome, email },
         { headers: { Authorization: `Bearer ${token}` } }
       );

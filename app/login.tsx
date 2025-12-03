@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { View, StyleSheet } from 'react-native';
-import { Input, Button, Text } from '@rneui/themed';
-import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Button, Input, Text } from '@rneui/themed';
+import axios from 'axios';
 import { Link, useRouter } from 'expo-router';
+import React, { useState } from 'react';
+import { StyleSheet, View } from 'react-native';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -17,14 +17,14 @@ export default function Login() {
     setLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:8000/auth/login', {
+      const response = await axios.post('http://localhost:8081/auth/login', {
         email,
         password: senha,
       });
 
       const token = response.data.token;
      // console.log('Token JWT:', token);
-     console.log('Usuário logado');
+     console.log(token);
 
       // Salvar o token no AsyncStorage
       await AsyncStorage.setItem('token', token);
