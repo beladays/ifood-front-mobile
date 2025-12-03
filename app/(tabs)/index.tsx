@@ -31,7 +31,7 @@ useEffect(() => {
       const token = localStorage.getItem("token");
 
       const response = await axios.get(
-        "http://localhost:8081/restaurante",
+        "http://localhost:8081/restaurante/mobile",
         {
           headers: {
             Authorization: `Bearer ${token}`,
