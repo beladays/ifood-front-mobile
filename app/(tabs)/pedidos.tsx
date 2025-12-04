@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, ActivityIndicator } from "react-native";
 import { Card } from "@rneui/themed";
 import axios from "axios";
+import React, { useEffect, useState } from "react";
+import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 
 type Pedido = {
   id: number;
@@ -50,7 +50,11 @@ export default function Pedidos() {
   useEffect(() => {
     async function fetchPedidos() {
       try {
-        const response = await axios.get("http://localhost:8081/pedidos/historico/cliente");
+        const token = localStorage.getItem("token");
+        const response = await axios.get("http://localhost:8081/pedidos/historico/cliente", {
+        headers: {Authorization: `Bearer ${token}`,
+        },
+      });
         setPedidos(response.data);
       } catch (error) {
         console.error("Erro ao carregar pedidos:", error);
