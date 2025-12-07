@@ -7,7 +7,7 @@ type Loja = {
   id: number;
   nome: string;
   descriçao:string;
-  logo: string;
+  urlImagem: string;
   categoria: string
 };
 
@@ -17,6 +17,8 @@ type Categoria = {
   imagemUrl: string
   
 };
+
+
 
 export default function Principal() {
   const [desc, setDesc] = useState<any>(null);
@@ -154,7 +156,7 @@ useEffect(() => {
         <Card.Divider />
         {Array.isArray(lojas) && lojas.map((l) => (
           <View key={l.id} style={styles.imgLoja}>
-            <Image style={styles.thumb} resizeMode="cover" source={{ uri: l.logo }} />
+            <Image style={styles.thumb} resizeMode="cover" source={{  uri: l.urlImagem? `http://localhost:8081${l.urlImagem.replace(/\\/g, "/")}`: "https://via.placeholder.com/100" }} />
             <Text style={styles.name}>{l.nome}</Text>
           </View>
         ))}
