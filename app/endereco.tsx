@@ -125,6 +125,12 @@ export default function EnderecoScreen() {
           buttonStyle={styles.botaoExcluir}
           radius={12}
         />
+        <Button
+          title="Editar"
+          onPress={excluirEndereco}
+          buttonStyle={styles.botaoEditar}
+          radius={12}
+        />
       </Card>
     </ScrollView>
   );
@@ -166,4 +172,12 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     marginTop: 10,
   },
+  botaoEditar:{
+    paddingVertical: 14,
+    marginTop: 10,
+    backgroundColor: "#00bd09ff"
+    
+
+
+  }
 });

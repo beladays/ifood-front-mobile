@@ -1,12 +1,12 @@
 import { Card, Text } from '@rneui/themed';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Image, ScrollView, StyleSheet, View } from 'react-native';
+import { Image, ScrollView, StyleSheet, View } from 'react-native';
 
 type Loja = {
   id: number;
   nome: string;
-  descriçao:string;
+  descriçao: string;
   urlImagem: string;
   categoria: string
 };
@@ -15,7 +15,7 @@ type Categoria = {
   id: number;
   nome: string;
   imagemUrl: string
-  
+
 };
 
 
@@ -27,143 +27,147 @@ export default function Principal() {
   const [categorias, setCategorias] = useState<Categoria[]>([]);
 
   // Carregar lojas
-useEffect(() => {
-  async function carregarLojas() {
-    try {
-      const token = localStorage.getItem("token");
-
-      const response = await axios.get(
-        "http://localhost:8081/restaurante/mobile",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          }
-        }
-      );
-
-      console.log("Resposta lojas:", response.data);
-
-      const dados = Array.isArray(response.data)
-        ? response.data
-        : response.data.lojas || [];
-
-      setLojas(dados);
-    } catch (error) {
-      console.error("Erro ao carregar lojas:", error);
-    }
-  }
-
-  carregarLojas();
-}, []);
-
-
-  // Card de desconto
   useEffect(() => {
-    async function CardDesconto() {
+    async function carregarLojas() {
       try {
-        const response = await axios.get(''); // coloque sua URL da API aqui
-        setDesc(response.data);
+        const token = localStorage.getItem("token");
+
+        const response = await axios.get(
+          "http://localhost:8081/restaurante/mobile",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            }
+          }
+        );
+
+        console.log("Resposta lojas:", response.data);
+
+        const dados = Array.isArray(response.data)
+          ? response.data
+          : response.data.lojas || [];
+
+        setLojas(dados);
       } catch (error) {
-        console.error('Erro ao carregar promoções:', error);
-      } finally {
-        setLoading(false);
+        console.error("Erro ao carregar lojas:", error);
       }
     }
 
-    CardDesconto();
+    carregarLojas();
   }, []);
 
+
+  // Card de desconto
+  // useEffect(() => {
+  //   async function CardDesconto() {
+  //     try {
+  //       const response = await axios.get(''); // coloque sua URL da API aqui
+  //       setDesc(response.data);
+  //     } catch (error) {
+  //       console.error('Erro ao carregar promoções:', error);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   }
+
+  //   CardDesconto();
+  // }, []);
+
   // Carregar categorias
- useEffect(() => {
-  async function carregarCategorias() {
-    try {
-      const token = localStorage.getItem("token"); // ou AsyncStorage no mobile
+  useEffect(() => {
+    async function carregarCategorias() {
+      try {
+        const token = localStorage.getItem("token"); // ou AsyncStorage no mobile
 
-      const response = await axios.get(
-        "http://localhost:8081/categorias/restaurantes",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
+        const response = await axios.get(
+          "http://localhost:8081/categorias/restaurantes",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
           }
-        }
-      );
+        );
 
-      console.log("Resposta categorias:", response.data);
+        console.log("Resposta categorias:", response.data);
 
-      const dados = Array.isArray(response.data)
-        ? response.data
-        : response.data.categorias || [];
+        const dados = Array.isArray(response.data)
+          ? response.data
+          : response.data.categorias || [];
 
-      setCategorias(dados);
-    } catch (error) {
-      console.error("Erro ao carregar categorias:", error);
+        setCategorias(dados);
+      } catch (error) {
+        console.error("Erro ao carregar categorias:", error);
+      }
     }
-  }
 
-  carregarCategorias();
-}, []);
+    carregarCategorias();
+  }, []);
+return (
+  <ScrollView style={{ flex: 1 }}>
+
+    {/* PROMOÇÕES */}
+    <Card>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={{ alignItems: "center" }}
+      >
+
+        <Image
+          style={{ width: 300, height: 200,  marginRight: 10 }}
+          resizeMode="contain"
+          source={{
+            uri: 'https://raw.githubusercontent.com/PatrickEN-dev/bt-food-front/main/public/promo-banner-02.png',
+          }}
+        />
+         <Image
+          style={{ width: 300, height: 200 ,  marginRight: 10}}
+          resizeMode="contain"
+          source={{
+            uri: 'https://raw.githubusercontent.com/PatrickEN-dev/bt-food-front/main/public/promo-banner-02.png',
+          }}
+        />
+      </ScrollView>
+    </Card>
 
 
-  return (
-    <ScrollView style={{ flex: 1 }}>
-      {/* CARD DAS PROMOÇÕES */}
-      <Card>
-        <Card.Title>Promoções da Semana</Card.Title>
-        <Card.Divider />
-        {loading ? (
-          <ActivityIndicator size="large" color="#E53935" />
-        ) : (
-          <View style={{ position: 'relative', alignItems: 'center' }}>
-            {desc && desc.image ? (
-              <Image
-                style={{ width: '100%', height: 200 }}
-                resizeMode="contain"
-                source={{ uri: desc.image }}
-              />
-            ) : (
-              <Image
-                style={{ width: '100%', height: 200 }}
-                resizeMode="contain"
-                source={{
-                  uri: 'https://raw.githubusercontent.com/PatrickEN-dev/bt-food-front/main/public/promo-banner-01.png',
-                }}
-              />
-            )}
-            <Text style={styles.promoText}>
-              {desc ? desc.nome || 'Promoção especial!' : 'Sem promoções no momento'}
-            </Text>
-          </View>
-        )}
-      </Card>
-
-      {/* CATEGORIAS */}
-      <Card>
-        <Card.Title>Categorias</Card.Title>
-        <Card.Divider />
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          {Array.isArray(categorias) && categorias.map((c) => (
-            <View key={c.id} style={styles.cardLoja}>
-              <Image source={{ uri: c.imagemUrl }} style={styles.logo} resizeMode="cover" />
-              <Text style={styles.nomeLoja}>{c.nome}</Text>
-            </View>
-          ))}
-        </ScrollView>
-      </Card>
-
-      {/* LISTA DOS RESTAURANTES */}
-      <Card>
-        <Card.Title>Todas as Lojas</Card.Title>
-        <Card.Divider />
-        {Array.isArray(lojas) && lojas.map((l) => (
-          <View key={l.id} style={styles.imgLoja}>
-            <Image style={styles.thumb} resizeMode="cover" source={{  uri: l.urlImagem? `http://localhost:8081${l.urlImagem.replace(/\\/g, "/")}`: "https://via.placeholder.com/100" }} />
-            <Text style={styles.name}>{l.nome}</Text>
+    {/* CATEGORIAS */}
+    <Card>
+      <Card.Title>Categorias</Card.Title>
+      <Card.Divider />
+      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+        {categorias.map((c) => (
+          <View key={c.id} style={styles.cardLoja}>
+            <Image source={{ uri: c.imagemUrl }} style={styles.logo} resizeMode="cover" />
+            <Text style={styles.nomeLoja}>{c.nome}</Text>
           </View>
         ))}
-      </Card>
-    </ScrollView>
-  );
-}
+      </ScrollView>
+    </Card>
+
+
+    {/* LOJAS */}
+    <Card>
+      <Card.Title>Todas as Lojas</Card.Title>
+      <Card.Divider />
+      {lojas.map((l) => (
+        <View key={l.id} style={styles.imgLoja}>
+          <Image
+            style={styles.thumb}
+            resizeMode="cover"
+            source={{
+              uri: l.urlImagem
+                ? `http://localhost:8081${l.urlImagem.replace(/\\/g, "/")}`
+                : "https://via.placeholder.com/100"
+            }}
+          />
+          <Text style={styles.name}>{l.nome}</Text>
+        </View>
+      ))}
+    </Card>
+
+  </ScrollView>
+);}
 
 const styles = StyleSheet.create({
   imgLoja: {
