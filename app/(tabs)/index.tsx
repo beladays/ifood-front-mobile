@@ -1,7 +1,7 @@
 import { Card, Text } from '@rneui/themed';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Image, ScrollView, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Image, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 type Loja = {
   id: number;
@@ -150,17 +150,35 @@ useEffect(() => {
         </ScrollView>
       </Card>
 
-      {/* LISTA DOS RESTAURANTES */}
-      <Card>
-        <Card.Title>Todas as Lojas</Card.Title>
-        <Card.Divider />
-        {Array.isArray(lojas) && lojas.map((l) => (
-          <View key={l.id} style={styles.imgLoja}>
-            <Image style={styles.thumb} resizeMode="cover" source={{  uri: l.urlImagem? `http://localhost:8081${l.urlImagem.replace(/\\/g, "/")}`: "https://via.placeholder.com/100" }} />
-            <Text style={styles.name}>{l.nome}</Text>
-          </View>
-        ))}
-      </Card>
+{/* LISTA DOS RESTAURANTES */}
+<Card>
+  <Card.Title>Todas as Lojas</Card.Title>
+  <Card.Divider />
+
+  {Array.isArray(lojas) && lojas.map((l) => {
+    const img = l.urlImagem
+      ? `http://localhost:8081${l.urlImagem.replace(/\\/g, "/")}`
+      : "https://via.placeholder.com/100";
+
+    return (
+      <TouchableOpacity
+        key={l.id}
+        onPress={() =>
+          navigation.navigate("ProdutosRestaurante", { idRestaurante: l.id })
+        }
+      >
+        <View style={styles.imgLoja}>
+          <Image
+            style={styles.thumb}
+            resizeMode="cover"
+            source={{ uri: img }}
+          />
+          <Text style={styles.name}>{l.nome}</Text>
+        </View>
+      </TouchableOpacity>
+    );
+  })}
+</Card>
     </ScrollView>
   );
 }
