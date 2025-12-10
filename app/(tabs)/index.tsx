@@ -1,7 +1,11 @@
 import { Card, Text } from '@rneui/themed';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
+<<<<<<< HEAD
 import { Image, ScrollView, StyleSheet, View } from 'react-native';
+=======
+import { ActivityIndicator, Image, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+>>>>>>> 6f2b329ae4777539d67ff7992a31be79df6a6e8e
 
 type Loja = {
   id: number;
@@ -131,6 +135,7 @@ return (
     </Card>
 
 
+<<<<<<< HEAD
     {/* CATEGORIAS */}
     <Card>
       <Card.Title>Categorias</Card.Title>
@@ -168,6 +173,86 @@ return (
 
   </ScrollView>
 );}
+=======
+  return (
+    <ScrollView style={{ flex: 1 }}>
+      {/* CARD DAS PROMOÇÕES */}
+      <Card>
+        <Card.Title>Promoções da Semana</Card.Title>
+        <Card.Divider />
+        {loading ? (
+          <ActivityIndicator size="large" color="#E53935" />
+        ) : (
+          <View style={{ position: 'relative', alignItems: 'center' }}>
+            {desc && desc.image ? (
+              <Image
+                style={{ width: '100%', height: 200 }}
+                resizeMode="contain"
+                source={{ uri: desc.image }}
+              />
+            ) : (
+              <Image
+                style={{ width: '100%', height: 200 }}
+                resizeMode="contain"
+                source={{
+                  uri: 'https://raw.githubusercontent.com/PatrickEN-dev/bt-food-front/main/public/promo-banner-01.png',
+                }}
+              />
+            )}
+            <Text style={styles.promoText}>
+              {desc ? desc.nome || 'Promoção especial!' : 'Sem promoções no momento'}
+            </Text>
+          </View>
+        )}
+      </Card>
+
+      {/* CATEGORIAS */}
+      <Card>
+        <Card.Title>Categorias</Card.Title>
+        <Card.Divider />
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          {Array.isArray(categorias) && categorias.map((c) => (
+            <View key={c.id} style={styles.cardLoja}>
+              <Image source={{ uri: c.imagemUrl }} style={styles.logo} resizeMode="cover" />
+              <Text style={styles.nomeLoja}>{c.nome}</Text>
+            </View>
+          ))}
+        </ScrollView>
+      </Card>
+
+{/* LISTA DOS RESTAURANTES */}
+<Card>
+  <Card.Title>Todas as Lojas</Card.Title>
+  <Card.Divider />
+
+  {Array.isArray(lojas) && lojas.map((l) => {
+    const img = l.urlImagem
+      ? `http://localhost:8081${l.urlImagem.replace(/\\/g, "/")}`
+      : "https://via.placeholder.com/100";
+
+    return (
+      <TouchableOpacity
+        key={l.id}
+        onPress={() =>
+          navigation.navigate("ProdutosRestaurante", { idRestaurante: l.id })
+        }
+      >
+        <View style={styles.imgLoja}>
+          <Image
+            style={styles.thumb}
+            resizeMode="cover"
+            source={{ uri: img }}
+          />
+          <Text style={styles.name}>{l.nome}</Text>
+        </View>
+      </TouchableOpacity>
+    );
+  })}
+</Card>
+    </ScrollView>
+  );
+}
+>>>>>>> 6f2b329ae4777539d67ff7992a31be79df6a6e8e
 
 const styles = StyleSheet.create({
   imgLoja: {
