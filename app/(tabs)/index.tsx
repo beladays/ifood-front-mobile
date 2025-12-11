@@ -1,12 +1,12 @@
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { Card, Text } from '@rneui/themed';
+import { Text } from '@rneui/themed';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { Image, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 type Loja = {
-  idRestaurante: number;   // 🔥 CORRIGIDO
+  idRestaurante: number;
   nome: string;
   urlImagem: string;
   categoria?: any;
@@ -83,63 +83,76 @@ export default function Principal() {
   }, []);
 
   return (
-    <ScrollView style={{ flex: 1 }}>
+    <ScrollView style={styles.container}>
 
       {/* PROMOÇÕES */}
-      <Card>
+      <View style={styles.promoSection}>
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ alignItems: "center" }}
+          contentContainerStyle={styles.promoScroll}
         >
-          <Image
-            style={{ width: 300, height: 200, marginRight: 10 }}
-            resizeMode="contain"
-            source={{
-              uri: 'https://raw.githubusercontent.com/PatrickEN-dev/bt-food-front/main/public/promo-banner-02.png',
-            }}
-          />
-          <Image
-            style={{ width: 300, height: 200, marginRight: 10 }}
-            resizeMode="contain"
-            source={{
-              uri: 'https://raw.githubusercontent.com/PatrickEN-dev/bt-food-front/main/public/promo-banner-02.png',
-            }}
-          />
+          <View style={styles.promoCard}>
+            <Image
+              style={styles.promoImage}
+              resizeMode="cover"
+              source={{
+                uri: 'https://raw.githubusercontent.com/PatrickEN-dev/bt-food-front/main/public/promo-banner-02.png',
+              }}
+            />
+          </View>
+          <View style={styles.promoCard}>
+            <Image
+              style={styles.promoImage}
+              resizeMode="cover"
+              source={{
+                uri: 'https://raw.githubusercontent.com/PatrickEN-dev/bt-food-front/main/public/promo-banner-02.png',
+              }}
+            />
+          </View>
         </ScrollView>
-      </Card>
+      </View>
 
       {/* CATEGORIAS */}
-      <Card>
-        <Card.Title>Categorias</Card.Title>
-        <Card.Divider />
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Categorias</Text>
+        <ScrollView 
+          horizontal 
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.categoriesScroll}
+        >
           {categorias.map((c) => (
-            <View key={c.id} style={styles.cardLoja}>
-              <Image source={{ uri: c.imagemUrl }} style={styles.logo} resizeMode="cover" />
-              <Text style={styles.nomeLoja}>{c.nome}</Text>
-            </View>
+            <TouchableOpacity key={c.id} style={styles.categoryCard}>
+              <View style={styles.categoryImageContainer}>
+                <Image 
+                  source={{ uri: c.imagemUrl }} 
+                  style={styles.categoryImage} 
+                  resizeMode="cover" 
+                />
+              </View>
+              <Text style={styles.categoryName}>{c.nome}</Text>
+            </TouchableOpacity>
           ))}
         </ScrollView>
-      </Card>
+      </View>
 
       {/* LOJAS */}
-      <Card>
-        <Card.Title>Todas as Lojas</Card.Title>
-        <Card.Divider />
-
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Restaurantes</Text>
+        
         {lojas.map((l) => (
           <TouchableOpacity
-            key={l.idRestaurante} // 🔥 CORRIGIDO
-            style={styles.imgLoja}
+            key={l.idRestaurante}
+            style={styles.restaurantCard}
             onPress={() =>
               navigation.navigate("ProdutosRestaurante", {
-                id: l.idRestaurante, // 🔥 CORRIGIDO
+                id: l.idRestaurante,
               })
             }
+            activeOpacity={0.7}
           >
             <Image
-              style={styles.thumb}
+              style={styles.restaurantImage}
               resizeMode="cover"
               source={{
                 uri: l.urlImagem
@@ -147,43 +160,133 @@ export default function Principal() {
                   : "https://via.placeholder.com/100"
               }}
             />
-            <Text style={styles.name}>{l.nome}</Text>
+            <View style={styles.restaurantInfo}>
+              <Text style={styles.restaurantName}>{l.nome}</Text>
+              <Text style={styles.restaurantDetails}>
+                ⭐ 4.5 • 30-40 min • R$ 10,00
+              </Text>
+            </View>
           </TouchableOpacity>
         ))}
+      </View>
 
-      </Card>
+      <View style={styles.bottomSpacing} />
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  imgLoja: {
+  container: {
+    flex: 1,
+    backgroundColor: '#F8F8F8',
+  },
+  
+  // SEÇÕES
+  section: {
+    marginTop: 24,
+    paddingHorizontal: 16,
+  },
+  sectionTitle: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#2E2E2E',
+    marginBottom: 16,
+  },
+  
+  // PROMOÇÕES
+  promoSection: {
+    marginTop: 16,
+    paddingLeft: 16,
+  },
+  promoScroll: {
+    paddingRight: 16,
+  },
+  promoCard: {
+    marginRight: 12,
+    borderRadius: 12,
+    overflow: 'hidden',
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  promoImage: {
+    width: 320,
+    height: 160,
+    backgroundColor: '#E0E0E0',
+  },
+  
+  // CATEGORIAS
+  categoriesScroll: {
+    paddingRight: 16,
+  },
+  categoryCard: {
+    alignItems: 'center',
+    marginRight: 20,
+    width: 80,
+  },
+  categoryImageContainer: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    backgroundColor: '#FFF',
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    overflow: 'hidden',
+    marginBottom: 8,
+  },
+  categoryImage: {
+    width: '100%',
+    height: '100%',
+  },
+  categoryName: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#2E2E2E',
+    textAlign: 'center',
+  },
+  
+  // RESTAURANTES
+  restaurantCard: {
     flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 10,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 12,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
+    shadowRadius: 3,
   },
-  thumb: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    marginRight: 10,
-  },
-  name: {
-    fontSize: 16,
-  },
-  cardLoja: {
-    alignItems: 'center',
-    marginRight: 15,
-  },
-  logo: {
+  restaurantImage: {
     width: 80,
     height: 80,
-    borderRadius: 40,
+    borderRadius: 8,
+    backgroundColor: '#E0E0E0',
   },
-  nomeLoja: {
-    marginTop: 5,
-    fontSize: 14,
-    fontWeight: 'bold',
-    textAlign: 'center',
+  restaurantInfo: {
+    flex: 1,
+    marginLeft: 12,
+    justifyContent: 'center',
+  },
+  restaurantName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#2E2E2E',
+    marginBottom: 6,
+  },
+  restaurantDetails: {
+    fontSize: 13,
+    color: '#717171',
+    lineHeight: 18,
+  },
+  
+  bottomSpacing: {
+    height: 24,
   },
 });

@@ -11,6 +11,21 @@ import {
   View,
 } from "react-native";
 
+interface Categoria {
+  id_categoria: number;
+  nome: string;
+}
+
+interface Produto {
+  idProduto: number;
+  nome: string;
+  descricao: string;
+  preco: number;
+  ativo: boolean;
+  urlImagem: string | null;
+  categoria: Categoria;
+}
+
 interface RouteParams {
   id: string | number;
 }
@@ -19,9 +34,9 @@ export default function ProdutosRestaurante() {
   const route = useRoute();
   const { id } = route.params as RouteParams;
 
-  const [produtos, setProdutos] = useState([]);
-  const [categorias, setCategorias] = useState([]);
-  const [categoriaAtiva, setCategoriaAtiva] = useState(null);
+  const [produtos, setProdutos] = useState<Produto[]>([]);
+  const [categorias, setCategorias] = useState<Categoria[]>([]);
+  const [categoriaAtiva, setCategoriaAtiva] = useState<number | null>(null);
   const [busca, setBusca] = useState("");
 
   console.log("ID recebido:", id);
@@ -34,13 +49,15 @@ export default function ProdutosRestaurante() {
       console.log("Produtos carregados:", resp.data);
       setProdutos(resp.data);
 
-      const categoriasUnicas = [];
-      resp.data.forEach((p) => {
-        if (p.categoria && !categoriasUnicas.some((c) => c.id === p.categoria.id)) {
+      const categoriasUnicas: Categoria[] = [];
+      resp.data.forEach((p: Produto) => {
+        if (
+          p.categoria &&
+          !categoriasUnicas.some((c) => c.id_categoria === p.categoria.id_categoria)
+        ) {
           categoriasUnicas.push(p.categoria);
         }
       });
-
       setCategorias(categoriasUnicas);
     } catch (error) {
       console.error("Erro ao carregar produtos:", error);
@@ -53,12 +70,10 @@ export default function ProdutosRestaurante() {
 
   const produtosFiltrados = produtos.filter((p) => {
     const matchCategoria =
-      categoriaAtiva === null || p.categoria?.id === categoriaAtiva;
-
+      categoriaAtiva === null || p.categoria?.id_categoria === categoriaAtiva;
     const matchBusca =
       p.nome.toLowerCase().includes(busca.toLowerCase()) ||
       p.descricao.toLowerCase().includes(busca.toLowerCase());
-
     return matchCategoria && matchBusca;
   });
 
@@ -107,17 +122,17 @@ export default function ProdutosRestaurante() {
 
             {categorias.map((c) => (
               <TouchableOpacity
-                key={c.id}
-                onPress={() => setCategoriaAtiva(c.id)}
+                key={c.id_categoria}
+                onPress={() => setCategoriaAtiva(c.id_categoria)}
                 style={[
                   styles.catItem,
-                  categoriaAtiva === c.id && styles.catAtiva,
+                  categoriaAtiva === c.id_categoria && styles.catAtiva,
                 ]}
               >
                 <Text
                   style={[
                     styles.catTexto,
-                    categoriaAtiva === c.id && styles.catTextoAtivo,
+                    categoriaAtiva === c.id_categoria && styles.catTextoAtivo,
                   ]}
                 >
                   {c.nome}
@@ -155,10 +170,11 @@ export default function ProdutosRestaurante() {
                     <Image
                       source={{
                         uri: p.urlImagem
-                          ? `http://10.0.2.2:8081${p.urlImagem.replace(/\\/g, "/")}`
+                          ? `http://localhost:8081${p.urlImagem.replace(/\\/g, "/")}`
                           : "https://via.placeholder.com/120",
                       }}
                       style={styles.prodImg}
+                      resizeMode="cover"
                     />
                     <TouchableOpacity style={styles.addButton}>
                       <Text style={styles.addButtonText}>+</Text>
@@ -174,6 +190,8 @@ export default function ProdutosRestaurante() {
             </View>
           )}
         </View>
+
+        <View style={styles.bottomSpacing} />
       </ScrollView>
     </View>
   );
@@ -182,12 +200,12 @@ export default function ProdutosRestaurante() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#F8F8F8",
   },
   scrollView: {
     flex: 1,
   },
-  
+
   // SEARCH
   searchContainer: {
     padding: 16,
@@ -312,7 +330,7 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     borderRadius: 8,
-    backgroundColor: "#f0f0f0",
+    backgroundColor: "#E0E0E0",
   },
   addButton: {
     position: "absolute",
@@ -351,5 +369,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#999",
     fontWeight: "500",
+  },
+
+  bottomSpacing: {
+    height: 24,
   },
 });
