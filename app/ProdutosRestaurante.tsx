@@ -1,33 +1,39 @@
+import { useRoute } from "@react-navigation/native";
 import axios from "axios";
-import { useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-    Image,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
+interface RouteParams {
+  id: string | number;
+}
+
 export default function ProdutosRestaurante() {
-  const { idRestaurante } = useLocalSearchParams();
+  const route = useRoute();
+  const { id } = route.params as RouteParams;
 
   const [produtos, setProdutos] = useState([]);
   const [categorias, setCategorias] = useState([]);
   const [categoriaAtiva, setCategoriaAtiva] = useState(null);
   const [busca, setBusca] = useState("");
 
+  console.log("ID recebido:", id);
+
   async function carregarProdutos() {
     try {
       const resp = await axios.get(
-        `http://10.0.2.2:8081/produtos/restaurante/${idRestaurante}`
+        `http://localhost:8081/produtos/restaurante/${id}`
       );
-
+      console.log("Produtos carregados:", resp.data);
       setProdutos(resp.data);
 
-      // 🔥 GERAR CATEGORIAS AUTOMATICAMENTE
       const categoriasUnicas = [];
       resp.data.forEach((p) => {
         if (p.categoria && !categoriasUnicas.some((c) => c.id === p.categoria.id)) {
@@ -45,7 +51,6 @@ export default function ProdutosRestaurante() {
     carregarProdutos();
   }, []);
 
-  // FILTRO
   const produtosFiltrados = produtos.filter((p) => {
     const matchCategoria =
       categoriaAtiva === null || p.categoria?.id === categoriaAtiva;
@@ -58,126 +63,293 @@ export default function ProdutosRestaurante() {
   });
 
   return (
-    <ScrollView style={{ flex: 1, backgroundColor: "#fff" }}>
-      
-      {/* BARRA DE PESQUISA */}
-      <View style={styles.searchContainer}>
-        <TextInput
-          placeholder="Buscar no restaurante..."
-          placeholderTextColor="#777"
-          style={styles.input}
-          value={busca}
-          onChangeText={setBusca}
-        />
-      </View>
-
-      {/* CATEGORIAS */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={styles.categorias}
-      >
-        <TouchableOpacity
-          onPress={() => setCategoriaAtiva(null)}
-          style={[
-            styles.catItem,
-            categoriaAtiva === null && styles.catAtiva,
-          ]}
-        >
-          <Text style={styles.catTexto}>Tudo</Text>
-        </TouchableOpacity>
-
-        {categorias.map((c) => (
-          <TouchableOpacity
-            key={c.id}
-            onPress={() => setCategoriaAtiva(c.id)}
-            style={[
-              styles.catItem,
-              categoriaAtiva === c.id && styles.catAtiva,
-            ]}
-          >
-            <Text style={styles.catTexto}>{c.nome}</Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
-
-      {/* LISTA DE PRODUTOS */}
-      {produtosFiltrados.map((p) => (
-        <View key={p.idProduto} style={styles.prodContainer}>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.prodNome}>{p.nome}</Text>
-            <Text style={styles.prodDesc} numberOfLines={2}>
-              {p.descricao}
-            </Text>
-            <Text style={styles.prodPreco}>R$ {p.preco.toFixed(2)}</Text>
+    <View style={styles.container}>
+      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+        {/* BARRA DE PESQUISA */}
+        <View style={styles.searchContainer}>
+          <View style={styles.searchBox}>
+            <Text style={styles.searchIcon}>🔍</Text>
+            <TextInput
+              placeholder="Buscar no cardápio"
+              placeholderTextColor="#999"
+              style={styles.input}
+              value={busca}
+              onChangeText={setBusca}
+            />
           </View>
-
-          <Image
-            source={{
-              uri: p.urlImagem
-                ? `http://10.0.2.2:8081${p.urlImagem.replace(/\\/g, "/")}`
-                : "https://via.placeholder.com/120",
-            }}
-            style={styles.prodImg}
-          />
         </View>
-      ))}
-    </ScrollView>
+
+        {/* CATEGORIAS */}
+        <View style={styles.categoriasWrapper}>
+          <Text style={styles.categoriasTitle}>Categorias</Text>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.categorias}
+            contentContainerStyle={styles.categoriasContent}
+          >
+            <TouchableOpacity
+              onPress={() => setCategoriaAtiva(null)}
+              style={[
+                styles.catItem,
+                categoriaAtiva === null && styles.catAtiva,
+              ]}
+            >
+              <Text
+                style={[
+                  styles.catTexto,
+                  categoriaAtiva === null && styles.catTextoAtivo,
+                ]}
+              >
+                Todos
+              </Text>
+            </TouchableOpacity>
+
+            {categorias.map((c) => (
+              <TouchableOpacity
+                key={c.id}
+                onPress={() => setCategoriaAtiva(c.id)}
+                style={[
+                  styles.catItem,
+                  categoriaAtiva === c.id && styles.catAtiva,
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.catTexto,
+                    categoriaAtiva === c.id && styles.catTextoAtivo,
+                  ]}
+                >
+                  {c.nome}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
+
+        {/* LISTA DE PRODUTOS */}
+        <View style={styles.produtosContainer}>
+          {produtosFiltrados.length > 0 ? (
+            produtosFiltrados.map((p) => (
+              <TouchableOpacity
+                key={p.idProduto}
+                style={styles.prodCard}
+                activeOpacity={0.7}
+              >
+                <View style={styles.prodContent}>
+                  <View style={styles.prodInfo}>
+                    <Text style={styles.prodNome} numberOfLines={2}>
+                      {p.nome}
+                    </Text>
+                    <Text style={styles.prodDesc} numberOfLines={3}>
+                      {p.descricao}
+                    </Text>
+                    <View style={styles.prodPrecoContainer}>
+                      <Text style={styles.prodPreco}>
+                        R$ {p.preco.toFixed(2)}
+                      </Text>
+                    </View>
+                  </View>
+
+                  <View style={styles.prodImageContainer}>
+                    <Image
+                      source={{
+                        uri: p.urlImagem
+                          ? `http://10.0.2.2:8081${p.urlImagem.replace(/\\/g, "/")}`
+                          : "https://via.placeholder.com/120",
+                      }}
+                      style={styles.prodImg}
+                    />
+                    <TouchableOpacity style={styles.addButton}>
+                      <Text style={styles.addButtonText}>+</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </TouchableOpacity>
+            ))
+          ) : (
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyIcon}>🍽️</Text>
+              <Text style={styles.emptyText}>Nenhum produto encontrado</Text>
+            </View>
+          )}
+        </View>
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
+  scrollView: {
+    flex: 1,
+  },
+  
+  // SEARCH
   searchContainer: {
-    padding: 15,
+    padding: 16,
+    backgroundColor: "#fff",
+    borderBottomWidth: 1,
+    borderBottomColor: "#f0f0f0",
+  },
+  searchBox: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#f5f5f5",
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    height: 48,
+  },
+  searchIcon: {
+    fontSize: 18,
+    marginRight: 8,
   },
   input: {
-    backgroundColor: "#f0f0f0",
-    padding: 12,
-    borderRadius: 12,
-    fontSize: 16,
+    flex: 1,
+    fontSize: 15,
+    color: "#333",
+  },
+
+  // CATEGORIAS
+  categoriasWrapper: {
+    paddingTop: 16,
+    paddingBottom: 8,
+    backgroundColor: "#fff",
+  },
+  categoriasTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#333",
+    paddingHorizontal: 16,
+    marginBottom: 12,
   },
   categorias: {
-    paddingLeft: 10,
-    paddingVertical: 10,
+    flexGrow: 0,
+  },
+  categoriasContent: {
+    paddingHorizontal: 16,
+    gap: 8,
   },
   catItem: {
-    paddingVertical: 7,
-    paddingHorizontal: 14,
-    backgroundColor: "#eee",
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    backgroundColor: "#fff",
     borderRadius: 20,
-    marginRight: 10,
+    marginRight: 8,
+    borderWidth: 1,
+    borderColor: "#e0e0e0",
+    minHeight: 36,
+    justifyContent: "center",
   },
   catAtiva: {
-    backgroundColor: "#E91E63",
+    backgroundColor: "#EA1D2C",
+    borderColor: "#EA1D2C",
   },
   catTexto: {
-    color: "#333",
-    fontSize: 15,
+    color: "#717171",
+    fontSize: 14,
+    fontWeight: "500",
   },
-  prodContainer: {
+  catTextoAtivo: {
+    color: "#fff",
+    fontWeight: "600",
+  },
+
+  // PRODUTOS
+  produtosContainer: {
+    paddingTop: 16,
+  },
+  prodCard: {
+    backgroundColor: "#fff",
+    marginHorizontal: 16,
+    marginBottom: 16,
+    borderRadius: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  prodContent: {
     flexDirection: "row",
-    padding: 15,
-    borderBottomWidth: 1,
-    borderColor: "#eee",
+    padding: 16,
+  },
+  prodInfo: {
+    flex: 1,
+    paddingRight: 12,
+    justifyContent: "space-between",
   },
   prodNome: {
     fontSize: 16,
-    fontWeight: "bold",
+    fontWeight: "600",
+    color: "#333",
+    lineHeight: 22,
+    marginBottom: 4,
   },
   prodDesc: {
-    color: "#777",
+    fontSize: 13,
+    color: "#717171",
+    lineHeight: 18,
+    marginBottom: 8,
+  },
+  prodPrecoContainer: {
     marginTop: 4,
-    maxWidth: 200,
   },
   prodPreco: {
-    marginTop: 6,
     fontSize: 16,
-    fontWeight: "bold",
+    fontWeight: "700",
+    color: "#333",
+  },
+  prodImageContainer: {
+    position: "relative",
+    width: 120,
+    height: 120,
   },
   prodImg: {
-    width: 90,
-    height: 90,
-    borderRadius: 12,
-    marginLeft: 10,
+    width: 120,
+    height: 120,
+    borderRadius: 8,
+    backgroundColor: "#f0f0f0",
+  },
+  addButton: {
+    position: "absolute",
+    bottom: -8,
+    right: -8,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "#EA1D2C",
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  addButtonText: {
+    color: "#fff",
+    fontSize: 24,
+    fontWeight: "600",
+    lineHeight: 28,
+  },
+
+  // EMPTY STATE
+  emptyContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 60,
+  },
+  emptyIcon: {
+    fontSize: 64,
+    marginBottom: 16,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: "#999",
+    fontWeight: "500",
   },
 });
