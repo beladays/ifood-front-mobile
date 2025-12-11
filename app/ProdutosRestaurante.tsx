@@ -26,6 +26,19 @@ interface Produto {
   categoria: Categoria;
 }
 
+interface Restaurante {
+  idRestaurante: number;
+  nome: string;
+  telefone: string;
+  cnpj: string;
+  raio_entrega: string;
+  urlImagem: string | null;
+  categoria: {
+    id: number;
+    nome: string;
+  };
+}
+
 interface RouteParams {
   id: string | number;
 }
@@ -34,12 +47,30 @@ export default function ProdutosRestaurante() {
   const route = useRoute();
   const { id } = route.params as RouteParams;
 
+  const [restaurante, setRestaurante] = useState<Restaurante | null>(null);
   const [produtos, setProdutos] = useState<Produto[]>([]);
   const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [categoriaAtiva, setCategoriaAtiva] = useState<number | null>(null);
   const [busca, setBusca] = useState("");
 
   console.log("ID recebido:", id);
+
+  async function carregarRestaurante() {
+    try {
+      const resp = await axios.get("http://localhost:8081/restaurante/mobile");
+      const restaurantes = resp.data;
+      const restauranteEncontrado = restaurantes.find(
+        (r: Restaurante) => r.idRestaurante === Number(id)
+      );
+      
+      if (restauranteEncontrado) {
+        setRestaurante(restauranteEncontrado);
+        console.log("Restaurante carregado:", restauranteEncontrado);
+      }
+    } catch (error) {
+      console.error("Erro ao carregar restaurante:", error);
+    }
+  }
 
   async function carregarProdutos() {
     try {
@@ -65,6 +96,7 @@ export default function ProdutosRestaurante() {
   }
 
   useEffect(() => {
+    carregarRestaurante();
     carregarProdutos();
   }, []);
 
@@ -80,6 +112,41 @@ export default function ProdutosRestaurante() {
   return (
     <View style={styles.container}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+        {/* HEADER DO RESTAURANTE */}
+        {restaurante && (
+          <View style={styles.headerContainer}>
+            <Image
+              source={{
+                uri: restaurante.urlImagem
+                  ? `http://localhost:8081${restaurante.urlImagem.replace(/\\/g, "/")}`
+                  : "https://via.placeholder.com/400x200",
+              }}
+              style={styles.headerImage}
+              resizeMode="cover"
+            />
+            <View style={styles.headerOverlay} />
+            <View style={styles.headerContent}>
+              <Text style={styles.restaurantName}>{restaurante.nome}</Text>
+              <View style={styles.restaurantInfo}>
+                <View style={styles.infoItem}>
+                  <Text style={styles.infoIcon}>⭐</Text>
+                  <Text style={styles.infoText}>4.5</Text>
+                </View>
+                <View style={styles.infoDivider} />
+                <View style={styles.infoItem}>
+                  <Text style={styles.infoIcon}>🛵</Text>
+                  <Text style={styles.infoText}>{restaurante.raio_entrega} km</Text>
+                </View>
+                <View style={styles.infoDivider} />
+                <View style={styles.infoItem}>
+                  <Text style={styles.infoIcon}>🏷️</Text>
+                  <Text style={styles.infoText}>{restaurante.categoria.nome}</Text>
+                </View>
+              </View>
+            </View>
+          </View>
+        )}
+
         {/* BARRA DE PESQUISA */}
         <View style={styles.searchContainer}>
           <View style={styles.searchBox}>
@@ -204,6 +271,64 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
+  },
+
+  // HEADER DO RESTAURANTE
+  headerContainer: {
+    position: "relative",
+    height: 240,
+    backgroundColor: "#000",
+  },
+  headerImage: {
+    width: "100%",
+    height: "100%",
+  },
+  headerOverlay: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: "50%",
+    backgroundColor: "rgba(0, 0, 0, 0.6)",
+  },
+  headerContent: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: 20,
+  },
+  restaurantName: {
+    fontSize: 28,
+    fontWeight: "700",
+    color: "#FFF",
+    marginBottom: 12,
+    textShadowColor: "rgba(0, 0, 0, 0.3)",
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
+  },
+  restaurantInfo: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  infoItem: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  infoIcon: {
+    fontSize: 16,
+    marginRight: 4,
+  },
+  infoText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#FFF",
+  },
+  infoDivider: {
+    width: 1,
+    height: 16,
+    backgroundColor: "rgba(255, 255, 255, 0.3)",
+    marginHorizontal: 12,
   },
 
   // SEARCH
