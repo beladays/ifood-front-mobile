@@ -1,7 +1,7 @@
+import axios from "axios";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { View, Text, Image, StyleSheet, TouchableOpacity, ActivityIndicator, ScrollView } from "react-native";
-import axios from "axios";
+import { ActivityIndicator, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 export default function DetalheProduto() {
   const { id } = useLocalSearchParams();
@@ -12,7 +12,7 @@ export default function DetalheProduto() {
 
   async function carregarProduto() {
     try {
-      const resp = await axios.get(`http://localhost:8081/produtos/${id}`);
+      const resp = await axios.get(`http://localhost:8081/produtos/detalhe/${id}`);
       setProduto(resp.data);
     } catch (error) {
       console.error("Erro ao carregar produto:", error);

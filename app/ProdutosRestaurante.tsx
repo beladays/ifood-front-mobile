@@ -1,5 +1,6 @@
 import { useRoute } from "@react-navigation/native";
 import axios from "axios";
+import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   Image,
@@ -10,7 +11,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { useRouter } from "expo-router";
 
 interface Categoria {
   id_categoria: number;
@@ -221,7 +221,7 @@ export default function ProdutosRestaurante() {
   style={styles.prodCard}
   activeOpacity={0.7}
   onPress={() => {
-     console.log("Indo para:", `/produtos/${p.idProduto}`);
+     console.log("Indo para:", `/produtos${p.idProduto}`);
   router.push(`/produtos/${p.idProduto}`);
   }}
 >
