@@ -1,13 +1,11 @@
-import React, { useState } from "react";
-import { View, Text, StyleSheet, Alert, ScrollView } from "react-native";
-import { Input, Button, Card } from "@rneui/themed";
+import { Button, Card, Input } from "@rneui/themed";
 import axios from "axios";
-import Icon from "react-native-vector-icons/MaterialIcons";
-import { TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
+import React, { useState } from "react";
+import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity } from "react-native";
+import Icon from "react-native-vector-icons/MaterialIcons";
 
 export type Endereco = {
-  id?: number;
   rua: string;
   numero: string;
   bairro: string;
@@ -31,10 +29,13 @@ export default function EnderecoScreen() {
   const atualizarCampo = (campo: keyof Endereco, valor: string) => {
     setEndereco((prev) => ({ ...prev, [campo]: valor }));
   };
-
+  const token = localStorage.getItem("token");
   const salvarEndereco = async () => {
     try {
-      const response = await axios.post("", endereco);
+      
+      const response = await axios.put("http://localhost:8081/endereco/editar", endereco, {
+                headers: { Authorization: `Bearer ${token}` },
+              });
       Alert.alert("Sucesso", "Endereço salvo com sucesso!");
       console.log(response.data);
     } catch (error) {
@@ -44,12 +45,12 @@ export default function EnderecoScreen() {
   };
 
   const excluirEndereco = async () => {
-    if (!endereco.id) {
+    if (!endereco) {
       return Alert.alert("Erro", "Nenhum endereço para excluir.");
     }
 
     try {
-      await axios.delete(`${endereco.id}`);
+      await axios.delete(`${endereco}`);
       Alert.alert("Endereço excluído!");
     } catch (error) {
       Alert.alert("Erro ao excluir endereço.");
