@@ -44,8 +44,8 @@ export default function DadosConta() {
   const editar = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
-      await axios.patch(
-        "http://localhost:8081/perfil",
+      await axios.put(
+        "http://localhost:8081/perfil/editar",
         { nome, email },
         { headers: { Authorization: `Bearer ${token}` } }
       );
