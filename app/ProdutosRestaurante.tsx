@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useRouter } from "expo-router";
 
 interface Categoria {
   id_categoria: number;
@@ -52,6 +53,8 @@ export default function ProdutosRestaurante() {
   const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [categoriaAtiva, setCategoriaAtiva] = useState<number | null>(null);
   const [busca, setBusca] = useState("");
+  const router = useRouter();
+
 
   console.log("ID recebido:", id);
 
@@ -210,15 +213,19 @@ export default function ProdutosRestaurante() {
         </View>
 
         {/* LISTA DE PRODUTOS */}
-        <View style={styles.produtosContainer}>
-          {produtosFiltrados.length > 0 ? (
-            produtosFiltrados.map((p) => (
-              <TouchableOpacity
-                key={p.idProduto}
-                style={styles.prodCard}
-                activeOpacity={0.7}
-              >
-                <View style={styles.prodContent}>
+<View style={styles.produtosContainer}>
+  {produtosFiltrados.length > 0 ? (
+    produtosFiltrados.map((p) => (
+<TouchableOpacity
+  key={p.idProduto}
+  style={styles.prodCard}
+  activeOpacity={0.7}
+  onPress={() => {
+     console.log("Indo para:", `/produtos/${p.idProduto}`);
+  router.push(`/produtos/${p.idProduto}`);
+  }}
+>
+  <View style={styles.prodContent}>
                   <View style={styles.prodInfo}>
                     <Text style={styles.prodNome} numberOfLines={2}>
                       {p.nome}
