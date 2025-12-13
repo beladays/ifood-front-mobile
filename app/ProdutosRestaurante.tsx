@@ -9,8 +9,10 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View,Pressable
 } from "react-native";
+import { useSacola } from "../context/SacolaContext";
+import SacolaFlutuante from '../components/botSacola'; 
 
 interface Categoria {
   id_categoria: number;
@@ -54,7 +56,7 @@ export default function ProdutosRestaurante() {
   const [categoriaAtiva, setCategoriaAtiva] = useState<number | null>(null);
   const [busca, setBusca] = useState("");
   const router = useRouter();
-
+  const { adicionar, total } = useSacola();
 
   console.log("ID recebido:", id);
 
@@ -210,63 +212,78 @@ export default function ProdutosRestaurante() {
               </TouchableOpacity>
             ))}
           </ScrollView>
+
+
         </View>
 
         {/* LISTA DE PRODUTOS */}
 <View style={styles.produtosContainer}>
   {produtosFiltrados.length > 0 ? (
     produtosFiltrados.map((p) => (
-<TouchableOpacity
-  key={p.idProduto}
-  style={styles.prodCard}
-  activeOpacity={0.7}
-  onPress={() => {
-     console.log("Indo para:", `/produtos${p.idProduto}`);
-  router.push(`/produtos/${p.idProduto}`);
-  }}
->
-  <View style={styles.prodContent}>
-                  <View style={styles.prodInfo}>
-                    <Text style={styles.prodNome} numberOfLines={2}>
-                      {p.nome}
-                    </Text>
-                    <Text style={styles.prodDesc} numberOfLines={3}>
-                      {p.descricao}
-                    </Text>
-                    <View style={styles.prodPrecoContainer}>
-                      <Text style={styles.prodPreco}>
-                        R$ {p.preco.toFixed(2)}
-                      </Text>
-                    </View>
-                  </View>
-
-                  <View style={styles.prodImageContainer}>
-                    <Image
-                      source={{
-                        uri: p.urlImagem
-                          ? `http://localhost:8081${p.urlImagem.replace(/\\/g, "/")}`
-                          : "https://via.placeholder.com/120",
-                      }}
-                      style={styles.prodImg}
-                      resizeMode="cover"
-                    />
-                    <TouchableOpacity style={styles.addButton}>
-                      <Text style={styles.addButtonText}>+</Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              </TouchableOpacity>
-            ))
-          ) : (
-            <View style={styles.emptyContainer}>
-              <Text style={styles.emptyIcon}>🍽️</Text>
-              <Text style={styles.emptyText}>Nenhum produto encontrado</Text>
+      <TouchableOpacity
+        key={p.idProduto}
+        style={styles.prodCard}
+        activeOpacity={0.7}
+        onPress={() => {
+          console.log("Indo para:", `/produtos/${p.idProduto}`);
+          router.push(`/produtos/${p.idProduto}`);
+        }}
+      >
+        <View style={styles.prodContent}>
+          <View style={styles.prodInfo}>
+            <Text style={styles.prodNome} numberOfLines={2}>
+              {p.nome}
+            </Text>
+            <Text style={styles.prodDesc} numberOfLines={3}>
+              {p.descricao}
+            </Text>
+            <View style={styles.prodPrecoContainer}>
+              <Text style={styles.prodPreco}>
+                R$ {p.preco.toFixed(2)}
+              </Text>
             </View>
-          )}
-        </View>
+          </View>
 
+          <View style={styles.prodImageContainer}>
+            <Image
+              source={{
+                uri: p.urlImagem
+                  ? `http://localhost:8081${p.urlImagem.replace(/\\/g, "/")}`
+                  : "https://via.placeholder.com/120",
+              }}
+              style={styles.prodImg}
+              resizeMode="cover"
+            />
+
+<Pressable
+  onPress={(e) => {
+    e.stopPropagation();
+    adicionar(p); // aqui é o contexto
+  }}
+  style={({ pressed }) => [
+    styles.addButton,
+    pressed && styles.addButtonPressed,
+  ]}
+>
+  <Text style={styles.addButtonText}>+</Text>
+</Pressable>
+          </View>
+        </View>
+      </TouchableOpacity>
+    ))
+  ) : (
+    <View style={styles.emptyContainer}>
+      <Text style={styles.emptyIcon}>🍽️</Text>
+      <Text style={styles.emptyText}>Nenhum produto encontrado</Text>
+    </View>
+  )}
+</View>
         <View style={styles.bottomSpacing} />
       </ScrollView>
+
+{/* BOTÃO FIXO DA SACOLA */}
+<SacolaFlutuante />
+     
     </View>
   );
 }
@@ -486,7 +503,10 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     lineHeight: 28,
   },
-
+addButtonPressed: {
+  transform: [{ scale: 0.92 }],
+  opacity: 0.85,
+},
   // EMPTY STATE
   emptyContainer: {
     alignItems: "center",
@@ -504,6 +524,40 @@ const styles = StyleSheet.create({
   },
 
   bottomSpacing: {
-    height: 24,
+    height: 90,
   },
+
+  sacolaBar: {
+  position: "absolute",
+  bottom: 0,
+  left: 0,
+  right: 0,
+  padding: 12,
+  backgroundColor: "#F8F8F8",
+  borderTopWidth: 1,
+  borderTopColor: "#eee",
+},
+
+sacolaButton: {
+  backgroundColor: "#EA1D2C",
+  borderRadius: 10,
+  paddingVertical: 14,
+  paddingHorizontal: 20,
+  flexDirection: "row",
+  justifyContent: "space-between",
+  alignItems: "center",
+},
+
+sacolaText: {
+  color: "#fff",
+  fontSize: 16,
+  fontWeight: "700",
+},
+
+sacolaTotal: {
+  color: "#fff",
+  fontSize: 16,
+  fontWeight: "700",
+},
+
 });
