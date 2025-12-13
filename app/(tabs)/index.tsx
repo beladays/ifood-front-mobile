@@ -85,19 +85,60 @@ export default function Principal() {
   return (
     <ScrollView style={styles.container}>
 
-      {/* PROMOÇÕES */}
+      {/* BANNERS*/}
       <View style={styles.promoSection}>
+         <Text style={styles.titulo}>Sabores para todos os gostos</Text>
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.promoScroll}
         >
+
           <View style={styles.promoCard}>
             <Image
               style={styles.promoImage}
               resizeMode="cover"
               source={{
-                uri: 'https://raw.githubusercontent.com/PatrickEN-dev/bt-food-front/main/public/promo-banner-02.png',
+                uri: 'https://raw.githubusercontent.com/ViniciusX22/onebitfood/master/public/images/categories/vegan.jpeg',
+              }}
+            />
+            </View>
+
+              <View style={styles.promoCard}>
+            <Image
+              style={styles.promoImage}
+              resizeMode="cover"
+              source={{
+                uri: 'https://raw.githubusercontent.com/ViniciusX22/onebitfood/master/public/images/categories/peruvian.jpg',
+              }}
+            />
+            </View>
+           <View style={styles.promoCard}>
+            <Image
+              style={styles.promoImage}
+              resizeMode="cover"
+              source={{
+                uri: 'https://raw.githubusercontent.com/ViniciusX22/onebitfood/master/public/images/categories/mexican.jpg',
+              }}
+            />
+            </View>
+
+          <View style={styles.promoCard}>
+            <Image
+              style={styles.promoImage}
+              resizeMode="cover"
+              source={{
+                uri: 'https://raw.githubusercontent.com/ViniciusX22/onebitfood/master/public/images/categories/italian.jpeg',
+              }}
+            />
+            </View>
+
+          <View style={styles.promoCard}>
+            <Image
+              style={styles.promoImage}
+              resizeMode="cover"
+              source={{
+                uri: 'https://raw.githubusercontent.com/ViniciusX22/onebitfood/master/public/images/categories/japonese.jpeg',
               }}
             />
           </View>
@@ -106,10 +147,11 @@ export default function Principal() {
               style={styles.promoImage}
               resizeMode="cover"
               source={{
-                uri: 'https://raw.githubusercontent.com/PatrickEN-dev/bt-food-front/main/public/promo-banner-02.png',
+                uri: 'https://raw.githubusercontent.com/ViniciusX22/onebitfood/master/public/images/categories/arabic.jpg',
               }}
             />
           </View>
+          
         </ScrollView>
       </View>
 
@@ -193,10 +235,19 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   
-  // PROMOÇÕES
+  // banners
   promoSection: {
     marginTop: 16,
     paddingLeft: 16,
+  },
+
+  titulo:{
+   fontSize: 21,
+    fontWeight: '700',
+    color: '#000000ff',
+    marginHorizontal: 16,
+    marginBottom: 12,
+    textAlign: 'center'
   },
   promoScroll: {
     paddingRight: 16,
