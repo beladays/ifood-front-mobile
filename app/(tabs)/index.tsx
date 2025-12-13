@@ -3,7 +3,10 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Text } from '@rneui/themed';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { Image, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Image, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native'
+import { Splash } from '../../components/Splash';
+import { useRouter } from 'expo-router';
+;
 
 type Loja = {
   idRestaurante: number;
@@ -26,9 +29,15 @@ type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 export default function Principal() {
   const navigation = useNavigation<NavigationProp>();
+  const [loading, setLoading] = useState(true);
 
   const [lojas, setLojas] = useState<Loja[]>([]);
   const [categorias, setCategorias] = useState<Categoria[]>([]);
+  const router = useRouter();
+
+  const handleDataLoadComplete = () => {
+    setLoading(false);
+  };
 
   // Carregar lojas
   useEffect(() => {
@@ -82,12 +91,21 @@ export default function Principal() {
     carregarCategorias();
   }, []);
 
+  // Animação/Splash
+  if (loading) {
+    return (
+      <Splash
+        onFinish={() => setLoading(false)} 
+      />
+    );
+  }
+
   return (
     <ScrollView style={styles.container}>
 
       {/* BANNERS*/}
       <View style={styles.promoSection}>
-         <Text style={styles.titulo}>Sabores para todos os gostos</Text>
+        <Text style={styles.titulo}>Sabores para todos os gostos</Text>
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -102,9 +120,9 @@ export default function Principal() {
                 uri: 'https://raw.githubusercontent.com/ViniciusX22/onebitfood/master/public/images/categories/vegan.jpeg',
               }}
             />
-            </View>
+          </View>
 
-              <View style={styles.promoCard}>
+          <View style={styles.promoCard}>
             <Image
               style={styles.promoImage}
               resizeMode="cover"
@@ -112,8 +130,8 @@ export default function Principal() {
                 uri: 'https://raw.githubusercontent.com/ViniciusX22/onebitfood/master/public/images/categories/peruvian.jpg',
               }}
             />
-            </View>
-           <View style={styles.promoCard}>
+          </View>
+          <View style={styles.promoCard}>
             <Image
               style={styles.promoImage}
               resizeMode="cover"
@@ -121,7 +139,7 @@ export default function Principal() {
                 uri: 'https://raw.githubusercontent.com/ViniciusX22/onebitfood/master/public/images/categories/mexican.jpg',
               }}
             />
-            </View>
+          </View>
 
           <View style={styles.promoCard}>
             <Image
@@ -131,7 +149,7 @@ export default function Principal() {
                 uri: 'https://raw.githubusercontent.com/ViniciusX22/onebitfood/master/public/images/categories/italian.jpeg',
               }}
             />
-            </View>
+          </View>
 
           <View style={styles.promoCard}>
             <Image
@@ -151,25 +169,25 @@ export default function Principal() {
               }}
             />
           </View>
-          
+
         </ScrollView>
       </View>
 
       {/* CATEGORIAS */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Categorias</Text>
-        <ScrollView 
-          horizontal 
+        <ScrollView
+          horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.categoriesScroll}
         >
           {categorias.map((c) => (
             <TouchableOpacity key={c.id} style={styles.categoryCard}>
               <View style={styles.categoryImageContainer}>
-                <Image 
-                  source={{ uri: c.imagemUrl }} 
-                  style={styles.categoryImage} 
-                  resizeMode="cover" 
+                <Image
+                  source={{ uri: c.imagemUrl }}
+                  style={styles.categoryImage}
+                  resizeMode="cover"
                 />
               </View>
               <Text style={styles.categoryName}>{c.nome}</Text>
@@ -181,7 +199,7 @@ export default function Principal() {
       {/* LOJAS */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Restaurantes</Text>
-        
+
         {lojas.map((l) => (
           <TouchableOpacity
             key={l.idRestaurante}
@@ -222,7 +240,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F8F8F8',
   },
-  
+
   // SEÇÕES
   section: {
     marginTop: 24,
@@ -234,15 +252,15 @@ const styles = StyleSheet.create({
     color: '#2E2E2E',
     marginBottom: 16,
   },
-  
+
   // banners
   promoSection: {
     marginTop: 16,
     paddingLeft: 16,
   },
 
-  titulo:{
-   fontSize: 21,
+  titulo: {
+    fontSize: 21,
     fontWeight: '700',
     color: '#000000ff',
     marginHorizontal: 16,
@@ -267,7 +285,7 @@ const styles = StyleSheet.create({
     height: 160,
     backgroundColor: '#E0E0E0',
   },
-  
+
   // CATEGORIAS
   categoriesScroll: {
     paddingRight: 16,
@@ -300,7 +318,7 @@ const styles = StyleSheet.create({
     color: '#2E2E2E',
     textAlign: 'center',
   },
-  
+
   // RESTAURANTES
   restaurantCard: {
     flexDirection: 'row',
@@ -336,7 +354,7 @@ const styles = StyleSheet.create({
     color: '#717171',
     lineHeight: 18,
   },
-  
+
   bottomSpacing: {
     height: 24,
   },
