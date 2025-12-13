@@ -1,10 +1,17 @@
-import React, { createContext, useContext, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 
+/* ================== TIPOS ================== */
 type Produto = {
   idProduto: number;
   nome: string;
   preco: number;
-  urlImagem?: string;
+  urlImagem?: string | null;
 };
 
 type ItemSacola = {
@@ -14,19 +21,51 @@ type ItemSacola = {
 
 type SacolaContextType = {
   itens: ItemSacola[];
-  adicionar: (produto: Produto, quantidade?: number) => void;
+  adicionar: (produto: Produto, qtd?: number) => void;
   remover: (idProduto: number) => void;
+  limpar: () => void;
   total: number;
 };
 
+/* ================== CONTEXT ================== */
 const SacolaContext = createContext<SacolaContextType>(
   {} as SacolaContextType
 );
 
-export function SacolaProvider({ children }: { children: React.ReactNode }) {
+/* ================== PROVIDER ================== */
+export function SacolaProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const [itens, setItens] = useState<ItemSacola[]>([]);
+  const [carregado, setCarregado] = useState(false);
 
-  function adicionar(produto: Produto, quantidade: number = 1) {
+  /* 🔹 CARREGAR sacola salva */
+  useEffect(() => {
+    (async () => {
+      try {
+        const data = await AsyncStorage.getItem("@sacola");
+        if (data) {
+          setItens(JSON.parse(data));
+        }
+      } catch (e) {
+        console.log("Erro ao carregar sacola", e);
+      } finally {
+        setCarregado(true);
+      }
+    })();
+  }, []);
+
+  /* 🔹 SALVAR sempre que mudar */
+  useEffect(() => {
+    if (carregado) {
+      AsyncStorage.setItem("@sacola", JSON.stringify(itens));
+    }
+  }, [itens, carregado]);
+
+  /* ================== FUNÇÕES ================== */
+  function adicionar(produto: Produto, qtd = 1) {
     setItens((prev) => {
       const existe = prev.find(
         (i) => i.produto.idProduto === produto.idProduto
@@ -35,12 +74,12 @@ export function SacolaProvider({ children }: { children: React.ReactNode }) {
       if (existe) {
         return prev.map((i) =>
           i.produto.idProduto === produto.idProduto
-            ? { ...i, quantidade: i.quantidade + quantidade }
+            ? { ...i, quantidade: i.quantidade + qtd }
             : i
         );
       }
 
-      return [...prev, { produto, quantidade }];
+      return [...prev, { produto, quantidade: qtd }];
     });
   }
 
@@ -56,18 +95,23 @@ export function SacolaProvider({ children }: { children: React.ReactNode }) {
     );
   }
 
+  function limpar() {
+    setItens([]);
+  }
+
   const total = itens.reduce(
-    (sum, i) => sum + Number(i.produto.preco) * i.quantidade,
+    (acc, i) => acc + i.produto.preco * i.quantidade,
     0
   );
 
   return (
-    <SacolaContext.Provider value={{ itens, adicionar, remover, total }}>
+    <SacolaContext.Provider
+      value={{ itens, adicionar, remover, limpar, total }}
+    >
       {children}
     </SacolaContext.Provider>
   );
 }
 
-export function useSacola() {
-  return useContext(SacolaContext);
-}
+/* ================== HOOK ================== */
+export const useSacola = () => useContext(SacolaContext);
