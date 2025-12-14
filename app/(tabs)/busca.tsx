@@ -1,3 +1,5 @@
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { SearchBar } from '@rneui/themed';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
@@ -12,48 +14,98 @@ import {
 } from 'react-native';
 import { API_BASE_URL } from '../config';
 
-type Categoria = {
-  id: number;
+/* =======================
+   TIPOS
+======================= */
+type Restaurante = {
+  idRestaurante: number;
   nome: string;
   urlImagem: string;
+  categoria: {
+    id: number;
+    nome: string;
+  };
 };
 
+type RootStackParamList = {
+  ProdutosRestaurante: { id: number };
+};
+
+type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
+
+/* =======================
+   COMPONENTE
+======================= */
 export default function Busca() {
+  const navigation = useNavigation<NavigationProp>();
+
   const [search, setSearch] = useState('');
-  const [categorias, setCategorias] = useState<Categoria[]>([]);
+  const [restaurantes, setRestaurantes] = useState<Restaurante[]>([]);
   const [loading, setLoading] = useState(true);
 
   const updateSearch = (text: string) => setSearch(text);
 
+  /* =======================
+     BUSCAR RESTAURANTES
+  ======================= */
   useEffect(() => {
-    async function fetchCategorias() {
+    async function fetchRestaurantes() {
       try {
-        const response = await axios.get<Categoria[]>(
+        const response = await axios.get<any[]>(
           `${API_BASE_URL}/categorias/restaurantes`
         );
-        setCategorias(response.data);
+
+        const listaRestaurantes: Restaurante[] = response.data.flatMap(
+          (categoria) =>
+            categoria.restaurantes.map((rest: any) => ({
+              idRestaurante: rest.idRestaurante,
+              nome: rest.nome,
+              urlImagem: rest.urlImagem,
+              categoria: {
+                id: categoria.id,
+                nome: categoria.nome,
+              },
+            }))
+        );
+
+        setRestaurantes(listaRestaurantes);
       } catch (error) {
-        console.error('Erro ao buscar categorias:', error);
+        console.error('Erro ao buscar restaurantes:', error);
       } finally {
         setLoading(false);
       }
     }
-    fetchCategorias();
+
+    fetchRestaurantes();
   }, []);
 
-  const categoriasFiltradas = categorias.filter((c) =>
-    c.nome.toLowerCase().includes(search.toLowerCase())
+  /* =======================
+     FILTRO
+  ======================= */
+  const restaurantesFiltrados = restaurantes.filter((r) =>
+    r.nome.toLowerCase().includes(search.toLowerCase())
   );
 
   const screenWidth = Dimensions.get('window').width;
   const cardWidth = (screenWidth - 30) / 2;
 
-  const renderItem = ({ item }: { item: Categoria }) => (
-    <TouchableOpacity style={[styles.card, { width: cardWidth }]}>
+  /* =======================
+     ITEM
+  ======================= */
+  const renderItem = ({ item }: { item: Restaurante }) => (
+    <TouchableOpacity
+      style={[styles.card, { width: cardWidth }]}
+      activeOpacity={0.8}
+      onPress={() =>
+        navigation.navigate('ProdutosRestaurante', {
+          id: item.idRestaurante,
+        })
+      }
+    >
       <ImageBackground
         source={{
           uri: item.urlImagem
-            ? `${API_BASE_URL}${item.urlImagem.replace(/\\/g, "/")}`
+            ? `${API_BASE_URL}${item.urlImagem.replace(/\\/g, '/')}`
             : 'https://via.placeholder.com/150',
         }}
         style={styles.imagemFundo}
@@ -61,11 +113,15 @@ export default function Busca() {
       >
         <View style={styles.overlay}>
           <Text style={styles.nome}>{item.nome}</Text>
+          <Text style={styles.categoria}>{item.categoria.nome}</Text>
         </View>
       </ImageBackground>
     </TouchableOpacity>
   );
 
+  /* =======================
+     RENDER
+  ======================= */
   return (
     <View style={styles.container}>
       <SearchBar
@@ -76,19 +132,19 @@ export default function Busca() {
         inputContainerStyle={styles.inputContainer}
       />
 
-      <Text style={styles.titulo}>Categorias</Text>
+      <Text style={styles.titulo}>Restaurantes</Text>
 
       <FlatList
-        data={categoriasFiltradas}
+        data={restaurantesFiltrados}
         renderItem={renderItem}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={(item) => item.idRestaurante.toString()}
         numColumns={2}
         columnWrapperStyle={styles.row}
         contentContainerStyle={{ paddingBottom: 20 }}
         ListEmptyComponent={
           !loading ? (
             <Text style={{ textAlign: 'center', marginTop: 20 }}>
-              Nenhuma categoria encontrada
+              Nenhum restaurante encontrado
             </Text>
           ) : null
         }
@@ -97,6 +153,9 @@ export default function Busca() {
   );
 }
 
+/* =======================
+   ESTILOS
+======================= */
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -127,7 +186,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   card: {
-    height: 100,
+    height: 120,
     borderRadius: 8,
     overflow: 'hidden',
   },
@@ -136,15 +195,17 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   overlay: {
-    backgroundColor: 'rgba(0,0,0,0.4)',
-    paddingVertical: 5,
+    backgroundColor: 'rgba(0,0,0,0.45)',
+    paddingVertical: 6,
     alignItems: 'center',
   },
   nome: {
     color: '#fff',
     fontSize: 14,
     fontWeight: '700',
-    textAlign: 'center',
-    paddingHorizontal: 5,
+  },
+  categoria: {
+    color: '#fff',
+    fontSize: 12,
   },
 });
