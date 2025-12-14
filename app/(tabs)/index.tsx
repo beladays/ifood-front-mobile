@@ -9,7 +9,7 @@ import { Image, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-nat
 import { Splash } from '../../components/Splash';
 
 
-const API_BASE_URL = "http://192.168.59.47:8081";
+const API_BASE_URL = "http://192.168.0.106:8081";
 
 
 type Loja = {
@@ -39,20 +39,6 @@ export default function Principal() {
   const [categoriaSelecionada, setCategoriaSelecionada] = useState<number | null>(null);
   const router = useRouter();
 
-  const handleDataLoadComplete = () => {
-    setLoading(false);
-  };
-
-  //ESTADO DA ANIMAÇÃO//
-  useEffect(() => {
-    const tabNav = navigation.getParent();
-    if (tabNav) {
-      tabNav.setOptions({
-        tabBarStyle: { display: loading ? 'none' : 'flex' },
-      });
-    }
-  }, [loading, navigation]);
-  //=================================//
 
   // Carregar lojas
   useEffect(() => {
@@ -106,12 +92,6 @@ export default function Principal() {
     carregarCategorias();
   }, []);
 
-  // Animação/Splash
-  if (loading) {
-    return (
-      <Splash onFinish={() => setLoading(false)} />
-    );
-  }
 
   // Filtrar lojas pelo categoria selecionada
   const lojasFiltradas = categoriaSelecionada
@@ -129,8 +109,28 @@ export default function Principal() {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.promoScroll}
         >
-          {/* ... banners ... */}
+
           <View style={styles.promoCard}>
+            <Image
+              style={styles.promoImage}
+              resizeMode="cover"
+              source={{
+                uri: 'https://raw.githubusercontent.com/ViniciusX22/onebitfood/master/public/images/categories/japonese.jpeg',
+              }}
+            />
+
+          </View>
+          <View style={styles.promoCard}>
+            <Image
+              style={styles.promoImage}
+              resizeMode="cover"
+              source={{
+                uri: 'https://raw.githubusercontent.com/ViniciusX22/onebitfood/master/public/images/categories/arabic.jpg',
+              }}
+            />
+          </View>
+
+           <View style={styles.promoCard}>
             <Image
               style={styles.promoImage}
               resizeMode="cover"
@@ -139,7 +139,33 @@ export default function Principal() {
               }}
             />
           </View>
-          {/* Repita para os outros banners... */}
+          
+
+           <View style={styles.promoCard}>
+            <Image
+              style={styles.promoImage}
+              resizeMode="cover"
+              source={{
+                uri: 'https://raw.githubusercontent.com/ViniciusX22/onebitfood/master/public/images/categories/italian.jpeg',
+              }}
+            />
+          </View>
+          
+
+           <View style={styles.promoCard}>
+            <Image
+              style={styles.promoImage}
+              resizeMode="cover"
+              source={{
+                uri: 'https://raw.githubusercontent.com/ViniciusX22/onebitfood/master/public/images/categories/mexican.jpg',
+              }}
+            />
+          </View>
+
+          
+          
+          
+
         </ScrollView>
       </View>
 
@@ -159,9 +185,10 @@ export default function Principal() {
             >
               <View style={styles.categoryImageContainer}>
                 <Image
-                  source={{ uri: c.urlImagem
-                    ? `${API_BASE_URL}${c.urlImagem.replace(/\\/g, "/")}`
-                    : "https://via.placeholder.com/100"
+                  source={{
+                    uri: c.urlImagem
+                      ? `${API_BASE_URL}${c.urlImagem.replace(/\\/g, "/")}`
+                      : "https://via.placeholder.com/100"
                   }}
                   style={styles.categoryImage}
                   resizeMode="cover"
