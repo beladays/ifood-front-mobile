@@ -4,6 +4,7 @@ import axios from 'axios';
 import { Link, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
+import { API_BASE_URL } from '../app/config';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -17,19 +18,18 @@ export default function Login() {
     setLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:8081/auth/login', {
+      const response = await axios.post(`${API_BASE_URL}/auth/login`, {
         email,
         password: senha,
       });
 
       const token = response.data.token;
-     // console.log('Token JWT:', token);
-     console.log(token);
+      console.log('Token JWT:', token);
 
       // Salvar o token no AsyncStorage
       await AsyncStorage.setItem('token', token);
 
-      // Navegar pra próxima tela 
+      // Navegar pra tela principal
       router.push('/');
 
     } catch (err: any) {
@@ -68,7 +68,7 @@ export default function Login() {
         onPress={handleLogin}
       />
 
-<View style={styles.linksContainer}>
+      <View style={styles.linksContainer}>
         <Link href="/esqueceuSenha" style={styles.linkSenha}>
           Esqueceu sua senha?
         </Link>
@@ -106,13 +106,13 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   linksContainer: {
-    alignItems: 'center', // centraliza horizontalmente
-    marginTop: 20,        // espaço entre o botão e os links
+    alignItems: 'center',
+    marginTop: 20,
   },
   linkSenha: {
     color: '#E60014',
     fontWeight: 'bold',
-    marginBottom: 10,     // espaço entre os dois links
+    marginBottom: 10,
   },
   linkText: {
     textAlign: 'center',

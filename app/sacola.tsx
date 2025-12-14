@@ -1,6 +1,9 @@
 import { useRouter } from "expo-router";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { API_BASE_URL } from "../app/config";
 import { useSacola } from "../context/SacolaContext";
+
+
 
 export default function Sacola() {
   const { itens, adicionar, remover, total } = useSacola();
@@ -15,7 +18,7 @@ export default function Sacola() {
           <Image
             source={{
               uri: item.produto.urlImagem
-                ? `http://localhost:8081${item.produto.urlImagem}`
+                ? `${API_BASE_URL}${item.produto.urlImagem.replace(/\\/g, "/")}`
                 : "https://via.placeholder.com/80",
             }}
             style={styles.imagem}
@@ -29,7 +32,9 @@ export default function Sacola() {
           </View>
 
           <View style={styles.qtd}>
-            <TouchableOpacity onPress={() => remover(item.produto.idProduto)}>
+            <TouchableOpacity
+              onPress={() => remover(item.produto.idProduto)}
+            >
               <Text style={styles.btn}>−</Text>
             </TouchableOpacity>
 
@@ -43,7 +48,9 @@ export default function Sacola() {
       ))}
 
       {/* BOTÃO FIXO */}
-      <TouchableOpacity style={styles.botaoFinal}>
+      <TouchableOpacity
+        style={styles.botaoFinal}
+      >
         <Text style={styles.botaoTexto}>
           Finalizar pedido • R$ {total.toFixed(2)}
         </Text>
@@ -51,9 +58,20 @@ export default function Sacola() {
     </View>
   );
 }
+
+/* ================= STYLES ================= */
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16, backgroundColor: "#fff" },
-  titulo: { fontSize: 24, fontWeight: "700", marginBottom: 20 },
+  container: {
+    flex: 1,
+    padding: 16,
+    backgroundColor: "#fff",
+  },
+
+  titulo: {
+    fontSize: 24,
+    fontWeight: "700",
+    marginBottom: 20,
+  },
 
   item: {
     flexDirection: "row",
@@ -61,10 +79,24 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
 
-  imagem: { width: 80, height: 80, borderRadius: 8, marginRight: 12 },
+  imagem: {
+    width: 80,
+    height: 80,
+    borderRadius: 8,
+    marginRight: 12,
+    backgroundColor: "#eee",
+  },
 
-  nome: { fontSize: 16, fontWeight: "600" },
-  preco: { color: "#EA1D2C", fontWeight: "700" },
+  nome: {
+    fontSize: 16,
+    fontWeight: "600",
+  },
+
+  preco: {
+    color: "#EA1D2C",
+    fontWeight: "700",
+    marginTop: 4,
+  },
 
   qtd: {
     flexDirection: "row",
@@ -75,9 +107,13 @@ const styles = StyleSheet.create({
     fontSize: 22,
     paddingHorizontal: 12,
     color: "#EA1D2C",
+    fontWeight: "700",
   },
 
-  quantidade: { fontSize: 16, fontWeight: "600" },
+  quantidade: {
+    fontSize: 16,
+    fontWeight: "600",
+  },
 
   botaoFinal: {
     backgroundColor: "#EA1D2C",
@@ -90,5 +126,9 @@ const styles = StyleSheet.create({
     right: 16,
   },
 
-  botaoTexto: { color: "#fff", fontSize: 18, fontWeight: "700" },
+  botaoTexto: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "700",
+  },
 });

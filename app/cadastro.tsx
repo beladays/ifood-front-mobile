@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Link, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
+import { API_BASE_URL } from '../app/config'; // ✅ import
 
 export default function Cadastro() {
   const [username, setUsername] = useState('');
@@ -19,20 +20,17 @@ export default function Cadastro() {
     setLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:8081/auth/registro', {
+      const response = await axios.post(`${API_BASE_URL}/auth/registro`, {
         username,
         email,
         password: senha,
       });
 
       console.log('Usuário cadastrado:', response.data);
-
       setSucesso('Cadastro realizado com sucesso!');
-      
-      // Opcional: aguarda 1s e redireciona pro login
-      setTimeout(() => {
-        router.push('/login');
-      }, 1000);
+
+      // Redireciona para login após 1s
+      setTimeout(() => router.push('/login'), 1000);
 
     } catch (err: any) {
       console.log(err.response?.data || err.message);
@@ -46,12 +44,7 @@ export default function Cadastro() {
     <View style={styles.container}>
       <Text h3 style={styles.title}>Criar Conta</Text>
 
-      <Input
-        placeholder="Nome de usuário"
-        value={username}
-        onChangeText={setUsername}
-      />
-
+      <Input placeholder="Nome de usuário" value={username} onChangeText={setUsername} />
       <Input
         placeholder="Email"
         value={email}
@@ -59,13 +52,7 @@ export default function Cadastro() {
         autoCapitalize="none"
         keyboardType="email-address"
       />
-
-      <Input
-        placeholder="Senha"
-        value={senha}
-        onChangeText={setSenha}
-        secureTextEntry
-      />
+      <Input placeholder="Senha" value={senha} onChangeText={setSenha} secureTextEntry />
 
       {erro ? <Text style={styles.error}>{erro}</Text> : null}
       {sucesso ? <Text style={styles.success}>{sucesso}</Text> : null}

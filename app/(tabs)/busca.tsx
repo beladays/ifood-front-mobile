@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { API_BASE_URL } from '../config';
 
 type Categoria = {
   id: number;
@@ -24,12 +25,11 @@ export default function Busca() {
 
   const updateSearch = (text: string) => setSearch(text);
 
-  // 🔹 Buscar categorias da API
   useEffect(() => {
     async function fetchCategorias() {
       try {
         const response = await axios.get<Categoria[]>(
-          'http://localhost:8081/categorias/restaurantes'
+          `${API_BASE_URL}/categorias/restaurantes`
         );
         setCategorias(response.data);
       } catch (error) {
@@ -38,11 +38,9 @@ export default function Busca() {
         setLoading(false);
       }
     }
-
     fetchCategorias();
   }, []);
 
-  // 🔹 Filtrar categorias pelo nome
   const categoriasFiltradas = categorias.filter((c) =>
     c.nome.toLowerCase().includes(search.toLowerCase())
   );
@@ -50,13 +48,12 @@ export default function Busca() {
   const screenWidth = Dimensions.get('window').width;
   const cardWidth = (screenWidth - 30) / 2;
 
-  // 🔹 Renderização do card
   const renderItem = ({ item }: { item: Categoria }) => (
     <TouchableOpacity style={[styles.card, { width: cardWidth }]}>
       <ImageBackground
         source={{
           uri: item.urlImagem
-            ? `http://localhost:8081${item.urlImagem}`
+            ? `${API_BASE_URL}${item.urlImagem.replace(/\\/g, "/")}`
             : 'https://via.placeholder.com/150',
         }}
         style={styles.imagemFundo}

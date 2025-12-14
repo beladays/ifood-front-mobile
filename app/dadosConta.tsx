@@ -13,6 +13,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { API_BASE_URL } from "../app/config";
 
 export default function DadosConta() {
   const [nome, setNome] = useState("");
@@ -24,10 +25,10 @@ export default function DadosConta() {
     async function carregarDados() {
       try {
         const token = await AsyncStorage.getItem("token");
-        const response = await axios.get("http://localhost:8081/perfil", {
+        const response = await axios.get(`${API_BASE_URL}/perfil`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-       
+
         setNome(response.data.nome);
         setEmail(response.data.email);
       } catch (error) {
@@ -45,7 +46,7 @@ export default function DadosConta() {
     try {
       const token = await AsyncStorage.getItem("token");
       await axios.put(
-        "http://localhost:8081/perfil/editar",
+        `${API_BASE_URL}/perfil/editar`,
         { nome, email },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -69,8 +70,8 @@ export default function DadosConta() {
           style: "destructive",
           onPress: async () => {
             try {
-              const token = "";
-              await axios.delete("http://localhost:8000/perfil", {
+              const token = await AsyncStorage.getItem("token");
+              await axios.delete(`${API_BASE_URL}/perfil`, {
                 headers: { Authorization: `Bearer ${token}` },
               });
 
@@ -101,7 +102,7 @@ export default function DadosConta() {
           <Icon name="arrow-back-ios" type="material" color="#d32f2f" size={22} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Minha Conta</Text>
-        <View style={{ width: 40 }} /> 
+        <View style={{ width: 40 }} />
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -152,11 +153,11 @@ export default function DadosConta() {
   );
 }
 
+// ... estilos permanecem iguais
+
+
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fafafa",
-  },
+  container: { flex: 1, backgroundColor: "#fafafa" },
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -169,73 +170,17 @@ const styles = StyleSheet.create({
     borderBottomColor: "#eee",
     elevation: 2,
   },
-  backButton: {
-    padding: 5,
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: "#d32f2f",
-  },
-  avatarContainer: {
-    alignItems: "center",
-    marginTop: 30,
-    marginBottom: 15,
-  },
-  avatarCircle: {
-    width: 90,
-    height: 90,
-    borderRadius: 45,
-    backgroundColor: "#fde4e4",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  avatarText: {
-    fontSize: 36,
-    fontWeight: "bold",
-    color: "#d32f2f",
-  },
-  card: {
-    borderRadius: 16,
-    padding: 20,
-    backgroundColor: "#fff",
-    elevation: 3,
-    marginHorizontal: 10,
-  },
-  label: {
-    fontSize: 14,
-    color: "#666",
-    marginBottom: 6,
-    marginTop: 10,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#eee",
-    borderRadius: 10,
-    padding: 12,
-    backgroundColor: "#f9f9f9",
-    fontSize: 16,
-  },
-  saveButton: {
-    backgroundColor: "#d32f2f",
-    borderRadius: 10,
-    paddingVertical: 14,
-  },
-  saveTitle: {
-    fontWeight: "bold",
-    fontSize: 16,
-  },
-  deleteButton: {
-    backgroundColor: "#fff",
-    borderWidth: 1,
-    borderColor: "#d32f2f",
-    borderRadius: 10,
-    paddingVertical: 14,
-  },
-  deleteTitle: {
-    color: "#d32f2f",
-    fontWeight: "bold",
-    fontSize: 16,
-  },
+  backButton: { padding: 5 },
+  headerTitle: { fontSize: 20, fontWeight: "700", color: "#d32f2f" },
+  avatarContainer: { alignItems: "center", marginTop: 30, marginBottom: 15 },
+  avatarCircle: { width: 90, height: 90, borderRadius: 45, backgroundColor: "#fde4e4", alignItems: "center", justifyContent: "center" },
+  avatarText: { fontSize: 36, fontWeight: "bold", color: "#d32f2f" },
+  card: { borderRadius: 16, padding: 20, backgroundColor: "#fff", elevation: 3, marginHorizontal: 10 },
+  label: { fontSize: 14, color: "#666", marginBottom: 6, marginTop: 10 },
+  input: { borderWidth: 1, borderColor: "#eee", borderRadius: 10, padding: 12, backgroundColor: "#f9f9f9", fontSize: 16 },
+  saveButton: { backgroundColor: "#d32f2f", borderRadius: 10, paddingVertical: 14 },
+  saveTitle: { fontWeight: "bold", fontSize: 16 },
+  deleteButton: { backgroundColor: "#fff", borderWidth: 1, borderColor: "#d32f2f", borderRadius: 10, paddingVertical: 14 },
+  deleteTitle: { color: "#d32f2f", fontWeight: "bold", fontSize: 16 },
   center: { flex: 1, justifyContent: "center", alignItems: "center" },
 });
