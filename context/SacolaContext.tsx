@@ -21,10 +21,21 @@ type ItemSacola = {
 
 type SacolaContextType = {
   itens: ItemSacola[];
-  adicionar: (produto: Produto, qtd?: number) => void;
+  idRestaurante: number | null;
+  adicionar: (
+    produto: Produto,
+    idRestaurante: number,
+    qtd?: number
+  ) => void;
   remover: (idProduto: number) => void;
   limpar: () => void;
   total: number;
+  montarPayload: () =>
+    | {
+        idRestaurante: number;
+        itens: { idProduto: number; quantidade: number }[];
+      }
+    | null;
 };
 
 /* ================== CONTEXT ================== */
@@ -39,6 +50,7 @@ export function SacolaProvider({
   children: React.ReactNode;
 }) {
   const [itens, setItens] = useState<ItemSacola[]>([]);
+  const [idRestaurante, setIdRestaurante] = useState<number | null>(null);
   const [carregado, setCarregado] = useState(false);
 
   /* 🔹 CARREGAR sacola salva */
@@ -47,7 +59,9 @@ export function SacolaProvider({
       try {
         const data = await AsyncStorage.getItem("@sacola");
         if (data) {
-          setItens(JSON.parse(data));
+          const parsed = JSON.parse(data);
+          setItens(parsed.itens || []);
+          setIdRestaurante(parsed.idRestaurante || null);
         }
       } catch (e) {
         console.log("Erro ao carregar sacola", e);
@@ -60,13 +74,25 @@ export function SacolaProvider({
   /* 🔹 SALVAR sempre que mudar */
   useEffect(() => {
     if (carregado) {
-      AsyncStorage.setItem("@sacola", JSON.stringify(itens));
+      AsyncStorage.setItem(
+        "@sacola",
+        JSON.stringify({ itens, idRestaurante })
+      );
     }
-  }, [itens, carregado]);
+  }, [itens, idRestaurante, carregado]);
 
   /* ================== FUNÇÕES ================== */
-  function adicionar(produto: Produto, qtd = 1) {
+  function adicionar(produto: Produto, restauranteId: number, qtd = 1) {
     setItens((prev) => {
+      if (idRestaurante && idRestaurante !== restauranteId) {
+        console.log("Sacola já pertence a outro restaurante");
+        return prev; // opcional: você pode alertar o usuário
+      }
+
+      if (!idRestaurante) {
+        setIdRestaurante(restauranteId);
+      }
+
       const existe = prev.find(
         (i) => i.produto.idProduto === produto.idProduto
       );
@@ -97,6 +123,7 @@ export function SacolaProvider({
 
   function limpar() {
     setItens([]);
+    setIdRestaurante(null);
   }
 
   const total = itens.reduce(
@@ -104,9 +131,29 @@ export function SacolaProvider({
     0
   );
 
+  function montarPayload() {
+    if (!idRestaurante || itens.length === 0) return null;
+
+    return {
+      idRestaurante,
+      itens: itens.map((i) => ({
+        idProduto: i.produto.idProduto,
+        quantidade: i.quantidade,
+      })),
+    };
+  }
+
   return (
     <SacolaContext.Provider
-      value={{ itens, adicionar, remover, limpar, total }}
+      value={{
+        itens,
+        idRestaurante,
+        adicionar,
+        remover,
+        limpar,
+        total,
+        montarPayload,
+      }}
     >
       {children}
     </SacolaContext.Provider>

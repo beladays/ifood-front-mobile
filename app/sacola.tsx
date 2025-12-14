@@ -1,7 +1,7 @@
 import { useRouter } from "expo-router";
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { API_BASE_URL } from "./config";
 import { useSacola } from "../context/SacolaContext";
+import { API_BASE_URL } from "./config";
 
 export default function Sacola() {
   const { itens, adicionar, remover, total } = useSacola();
@@ -37,10 +37,7 @@ export default function Sacola() {
       </View>
 
       {/* LISTA DE ITENS */}
-      <ScrollView 
-        style={styles.scrollArea}
-        showsVerticalScrollIndicator={false}
-      >
+      <ScrollView style={styles.scrollArea} showsVerticalScrollIndicator={false}>
         <View style={styles.listaItens}>
           {itens.map((item) => (
             <View key={item.produto.idProduto} style={styles.itemCard}>
@@ -68,10 +65,7 @@ export default function Sacola() {
               <View style={styles.qtdContainer}>
                 <TouchableOpacity 
                   onPress={() => remover(item.produto.idProduto)}
-                  style={[
-                    styles.qtdBotao,
-                    item.quantidade === 1 && styles.qtdBotaoDisabled
-                  ]}
+                  style={[styles.qtdBotao, item.quantidade === 1 && styles.qtdBotaoDisabled]}
                 >
                   <Text style={styles.qtdTexto}>−</Text>
                 </TouchableOpacity>
@@ -79,7 +73,7 @@ export default function Sacola() {
                 <Text style={styles.quantidade}>{item.quantidade}</Text>
 
                 <TouchableOpacity 
-                  onPress={() => adicionar(item.produto)}
+                  onPress={() => adicionar(item.produto, item.produto.idRestaurante)}
                   style={styles.qtdBotao}
                 >
                   <Text style={styles.qtdTexto}>+</Text>
@@ -92,7 +86,6 @@ export default function Sacola() {
         {/* RESUMO */}
         <View style={styles.resumoCard}>
           <Text style={styles.resumoTitulo}>Resumo do pedido</Text>
-          
           <View style={styles.resumoLinha}>
             <Text style={styles.totalTexto}>Total</Text>
             <Text style={styles.totalValor}>R$ {total.toFixed(2)}</Text>
@@ -116,6 +109,9 @@ export default function Sacola() {
     </View>
   );
 }
+
+
+
 
 const styles = StyleSheet.create({
   container: {
