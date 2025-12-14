@@ -6,26 +6,48 @@ import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Image, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Splash } from '../../components/Splash';
-;
 
 type Loja = {
   idRestaurante: number;
   nome: string;
   urlImagem: string;
-  categoria?: any;
-
+  categoria?: { id: number; nome: string; urlImagem: string };
 };
 
 type Categoria = {
   id: number;
   nome: string;
-  imagemUrl: string;
+  urlImagem: string;
 };
 
+type RootStackParamList = {
+  ProdutosRestaurante: { id: number };
+};
+
+type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
+
 export default function Principal() {
+  const navigation = useNavigation<NavigationProp>();
+  const [loading, setLoading] = useState(true);
   const [lojas, setLojas] = useState<Loja[]>([]);
   const [categorias, setCategorias] = useState<Categoria[]>([]);
+  const [categoriaSelecionada, setCategoriaSelecionada] = useState<number | null>(null);
   const router = useRouter();
+
+  const handleDataLoadComplete = () => {
+    setLoading(false);
+  };
+
+  //ESTADO DA ANIMAÇÃO//
+  useEffect(() => {
+    const tabNav = navigation.getParent();
+    if (tabNav) {
+      tabNav.setOptions({
+        tabBarStyle: { display: loading ? 'none' : 'flex' },
+      });
+    }
+  }, [loading, navigation]);
+  //=================================//
 
   // Carregar lojas
   useEffect(() => {
@@ -79,10 +101,22 @@ export default function Principal() {
     carregarCategorias();
   }, []);
 
+  // Animação/Splash
+  if (loading) {
+    return (
+      <Splash onFinish={() => setLoading(false)} />
+    );
+  }
+
+  // Filtrar lojas pelo categoria selecionada
+  const lojasFiltradas = categoriaSelecionada
+    ? lojas.filter((l) => l.categoria?.id === categoriaSelecionada)
+    : lojas;
+
   return (
     <ScrollView style={styles.container}>
 
-      {/* BANNERS*/}
+      {/* BANNERS */}
       <View style={styles.promoSection}>
         <Text style={styles.titulo}>Sabores para todos os gostos</Text>
         <ScrollView
@@ -90,7 +124,6 @@ export default function Principal() {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.promoScroll}
         >
-
           <View style={styles.promoCard}>
             <Image
               style={styles.promoImage}
@@ -100,7 +133,6 @@ export default function Principal() {
               }}
             />
           </View>
-
           <View style={styles.promoCard}>
             <Image
               style={styles.promoImage}
@@ -119,7 +151,6 @@ export default function Principal() {
               }}
             />
           </View>
-
           <View style={styles.promoCard}>
             <Image
               style={styles.promoImage}
@@ -129,7 +160,6 @@ export default function Principal() {
               }}
             />
           </View>
-
           <View style={styles.promoCard}>
             <Image
               style={styles.promoImage}
@@ -148,7 +178,6 @@ export default function Principal() {
               }}
             />
           </View>
-
         </ScrollView>
       </View>
 
@@ -161,13 +190,16 @@ export default function Principal() {
           contentContainerStyle={styles.categoriesScroll}
         >
           {categorias.map((c) => (
-            <TouchableOpacity key={c.id} style={styles.categoryCard}>
+            <TouchableOpacity
+              key={c.id}
+              style={styles.categoryCard}
+              onPress={() => setCategoriaSelecionada(c.id)}
+            >
               <View style={styles.categoryImageContainer}>
                 <Image
-                  source={{
-                    uri: c.imagemUrl
-                      ? `http://localhost:8081${c.imagemUrl.replace(/\\/g, "/")}`
-                      : "https://via.placeholder.com/100"
+                  source={{ uri: c.urlImagem
+                    ? `http://localhost:8081${c.urlImagem.replace(/\\/g, "/")}`
+                    : "https://via.placeholder.com/100"
                   }}
                   style={styles.categoryImage}
                   resizeMode="cover"
@@ -183,26 +215,15 @@ export default function Principal() {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Restaurantes</Text>
 
-        {lojas.map((l) => (
+        {lojasFiltradas.map((l) => (
           <TouchableOpacity
             key={l.idRestaurante}
             style={styles.restaurantCard}
-
-            //troca 
-
-            // onPress={() =>
-            //   navigation.navigate("ProdutosRestaurante", {
-            //     id: l.idRestaurante,
-            //   })
-            // }
-
             onPress={() =>
-              router.push({
-                pathname: "/ProdutosRestaurante",
-                params: { id: l.idRestaurante },
+              navigation.navigate("ProdutosRestaurante", {
+                id: l.idRestaurante,
               })
             }
-
             activeOpacity={0.7}
           >
             <Image
@@ -234,8 +255,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F8F8F8',
   },
-
-  // SEÇÕES
   section: {
     marginTop: 24,
     paddingHorizontal: 16,
@@ -246,13 +265,10 @@ const styles = StyleSheet.create({
     color: '#2E2E2E',
     marginBottom: 16,
   },
-
-  // banners
   promoSection: {
     marginTop: 16,
     paddingLeft: 16,
   },
-
   titulo: {
     fontSize: 21,
     fontWeight: '700',
@@ -279,8 +295,6 @@ const styles = StyleSheet.create({
     height: 160,
     backgroundColor: '#E0E0E0',
   },
-
-  // CATEGORIAS
   categoriesScroll: {
     paddingRight: 16,
   },
@@ -312,8 +326,6 @@ const styles = StyleSheet.create({
     color: '#2E2E2E',
     textAlign: 'center',
   },
-
-  // RESTAURANTES
   restaurantCard: {
     flexDirection: 'row',
     backgroundColor: '#FFFFFF',
@@ -348,7 +360,6 @@ const styles = StyleSheet.create({
     color: '#717171',
     lineHeight: 18,
   },
-
   bottomSpacing: {
     height: 24,
   },
