@@ -9,7 +9,7 @@ import { Image, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-nat
 import { Splash } from '../../components/Splash';
 
 
-const API_BASE_URL = "http://192.168.59.47:8081";
+const API_BASE_URL = "http://192.168.1.7:8081";
 
 
 type Loja = {
