@@ -17,9 +17,6 @@ import { API_BASE_URL } from "../app/config";
 import SacolaFlutuante from "../components/botSacola";
 import { useSacola } from "../context/SacolaContext";
 
-
-
-
 /* ================= INTERFACES ================= */
 interface Categoria {
   id_categoria: number;
@@ -34,6 +31,7 @@ interface Produto {
   ativo: boolean;
   urlImagem: string | null;
   categoria: Categoria;
+  idRestaurante: number; // Adicionado
 }
 
 interface Restaurante {
@@ -89,10 +87,16 @@ export default function ProdutosRestaurante() {
         `${API_BASE_URL}/produtos/restaurante/${id}`
       );
 
-      setProdutos(resp.data);
+      // Mapear idRestaurante nos produtos
+      const produtosComRestaurante = resp.data.map((p: Produto) => ({
+        ...p,
+        idRestaurante: Number(id),
+      }));
+
+      setProdutos(produtosComRestaurante);
 
       const categoriasUnicas: Categoria[] = [];
-      resp.data.forEach((p: Produto) => {
+      produtosComRestaurante.forEach((p: Produto) => {
         if (
           p.categoria &&
           !categoriasUnicas.some(
@@ -173,10 +177,7 @@ export default function ProdutosRestaurante() {
         {/* CATEGORIAS */}
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           <TouchableOpacity
-            style={[
-              styles.catItem,
-              categoriaAtiva === null && styles.catAtiva,
-            ]}
+            style={[styles.catItem, categoriaAtiva === null && styles.catAtiva]}
             onPress={() => setCategoriaAtiva(null)}
           >
             <Text style={styles.catTexto}>Todos</Text>
@@ -185,10 +186,7 @@ export default function ProdutosRestaurante() {
           {categorias.map((c) => (
             <TouchableOpacity
               key={c.id_categoria}
-              style={[
-                styles.catItem,
-                categoriaAtiva === c.id_categoria && styles.catAtiva,
-              ]}
+              style={[styles.catItem, categoriaAtiva === c.id_categoria && styles.catAtiva]}
               onPress={() => setCategoriaAtiva(c.id_categoria)}
             >
               <Text style={styles.catTexto}>{c.nome}</Text>
@@ -208,9 +206,7 @@ export default function ProdutosRestaurante() {
                 <View style={{ flex: 1 }}>
                   <Text style={styles.prodNome}>{p.nome}</Text>
                   <Text style={styles.prodDesc}>{p.descricao}</Text>
-                  <Text style={styles.prodPreco}>
-                    R$ {p.preco.toFixed(2)}
-                  </Text>
+                  <Text style={styles.prodPreco}>R$ {p.preco.toFixed(2)}</Text>
                 </View>
 
                 <View>
@@ -226,7 +222,7 @@ export default function ProdutosRestaurante() {
                   <Pressable
                     onPress={(e) => {
                       e.stopPropagation();
-                      adicionar(p);
+                      adicionar(p, Number(id));
                     }}
                     style={styles.addButton}
                   >
@@ -246,65 +242,28 @@ export default function ProdutosRestaurante() {
   );
 }
 
-/* ================= STYLES ================= */
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#F8F8F8" },
-
   headerContainer: { height: 240 },
   headerImage: { width: "100%", height: "100%" },
-  headerOverlay: {
-    position: "absolute",
-    bottom: 0,
-    height: "50%",
-    width: "100%",
-    backgroundColor: "rgba(0,0,0,0.6)",
-  },
+  headerOverlay: { position: "absolute", bottom: 0, height: "50%", width: "100%", backgroundColor: "rgba(0,0,0,0.6)" },
   headerContent: { position: "absolute", bottom: 20, left: 20 },
   restaurantName: { fontSize: 26, color: "#fff", fontWeight: "700" },
   restaurantInfo: { flexDirection: "row", marginTop: 8 },
   infoText: { color: "#fff", fontWeight: "600" },
   infoDivider: { color: "#fff", marginHorizontal: 6 },
-
   searchContainer: { padding: 16 },
-  input: {
-    backgroundColor: "#eee",
-    borderRadius: 8,
-    padding: 12,
-  },
-
-  catItem: {
-    padding: 10,
-    margin: 8,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: "#ccc",
-  },
+  input: { backgroundColor: "#eee", borderRadius: 8, padding: 12 },
+  catItem: { padding: 10, margin: 8, borderRadius: 20, borderWidth: 1, borderColor: "#ccc" },
   catAtiva: { backgroundColor: "#EA1D2C" },
   catTexto: { color: "#000", fontWeight: "600" },
-
   produtosContainer: { padding: 16 },
-  prodCard: {
-    backgroundColor: "#fff",
-    borderRadius: 12,
-    marginBottom: 16,
-    padding: 12,
-  },
+  prodCard: { backgroundColor: "#fff", borderRadius: 12, marginBottom: 16, padding: 12 },
   prodContent: { flexDirection: "row" },
   prodNome: { fontSize: 16, fontWeight: "700" },
   prodDesc: { color: "#666", marginVertical: 4 },
   prodPreco: { fontSize: 16, fontWeight: "700" },
-
   prodImg: { width: 120, height: 120, borderRadius: 8 },
-  addButton: {
-    position: "absolute",
-    bottom: -10,
-    right: -10,
-    backgroundColor: "#EA1D2C",
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: "center",
-    justifyContent: "center",
-  },
+  addButton: { position: "absolute", bottom: -10, right: -10, backgroundColor: "#EA1D2C", width: 40, height: 40, borderRadius: 20, alignItems: "center", justifyContent: "center" },
   addButtonText: { color: "#fff", fontSize: 22 },
 });
