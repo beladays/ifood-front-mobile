@@ -13,7 +13,7 @@ type Loja = {
   nome: string;
   urlImagem: string;
   categoria?: any;
- 
+
 };
 
 type Categoria = {
@@ -22,34 +22,10 @@ type Categoria = {
   imagemUrl: string;
 };
 
-type RootStackParamList = {
-  ProdutosRestaurante: { id: number };
-};
-
-type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
-
 export default function Principal() {
-  const navigation = useNavigation<NavigationProp>();
-  const [loading, setLoading] = useState(true);
-
   const [lojas, setLojas] = useState<Loja[]>([]);
   const [categorias, setCategorias] = useState<Categoria[]>([]);
   const router = useRouter();
-
-  const handleDataLoadComplete = () => {
-    setLoading(false);
-  };
-
-  //ESTADO DA ANIMAÇÃO//
- useEffect(() => {
-  const tabNav = navigation.getParent();
-  if (tabNav) {
-    tabNav.setOptions({
-      tabBarStyle: { display: loading ? 'none' : 'flex' },
-    });
-  }
-}, [loading, navigation]);
-//=================================//
 
   // Carregar lojas
   useEffect(() => {
@@ -102,17 +78,6 @@ export default function Principal() {
 
     carregarCategorias();
   }, []);
-
-
-  
-  // Animação/Splash
-  if (loading) {
-    return (
-      <Splash
-        onFinish={() => setLoading(false)} 
-      />
-    );
-  }
 
   return (
     <ScrollView style={styles.container}>
@@ -199,12 +164,14 @@ export default function Principal() {
             <TouchableOpacity key={c.id} style={styles.categoryCard}>
               <View style={styles.categoryImageContainer}>
                 <Image
-                    source={{ uri: c.urlImagem
-                    ? `http://localhost:8081${c.urlImagem.replace(/\\/g, "/")}`
-                    : "https://via.placeholder.com/100" }}
-                    style={styles.categoryImage}
-                    resizeMode="cover"
-                  />
+                  source={{
+                    uri: c.imagemUrl
+                      ? `http://localhost:8081${c.imagemUrl.replace(/\\/g, "/")}`
+                      : "https://via.placeholder.com/100"
+                  }}
+                  style={styles.categoryImage}
+                  resizeMode="cover"
+                />
               </View>
               <Text style={styles.categoryName}>{c.nome}</Text>
             </TouchableOpacity>
@@ -220,11 +187,22 @@ export default function Principal() {
           <TouchableOpacity
             key={l.idRestaurante}
             style={styles.restaurantCard}
+
+            //troca 
+
+            // onPress={() =>
+            //   navigation.navigate("ProdutosRestaurante", {
+            //     id: l.idRestaurante,
+            //   })
+            // }
+
             onPress={() =>
-              navigation.navigate("ProdutosRestaurante", {
-                id: l.idRestaurante,
+              router.push({
+                pathname: "/ProdutosRestaurante",
+                params: { id: l.idRestaurante },
               })
             }
+
             activeOpacity={0.7}
           >
             <Image

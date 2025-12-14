@@ -4,31 +4,12 @@ import React from 'react';
 import { Icon } from '@rneui/themed';
 import { HapticTab } from '@/components/haptic-tab';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { Splash } from '@/components/Splash';
+
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
-  const [loading, setLoading] = useState(true);
-
-  const navigation = useNavigation(); // pega o Tabs navigator
-
-  // Atualiza dinamicamente a Tab Bar (sempre executa o hook)
-  useEffect(() => {
-    const tabNav = navigation.getParent(); // pega o Tab Navigator pai
-    if (tabNav) {
-      tabNav.setOptions({
-        tabBarStyle: { display: loading ? 'none' : 'flex' },
-      });
-    }
-  }, [loading, navigation]);
-
   return (
-    <>
-      {/* Splash */}
-      {loading && <Splash onFinish={() => setLoading(false)} />}
-
-      {/* Tabs */}
-      {!loading && (
+    
         <Tabs
           screenOptions={{
             headerShown: false,
@@ -68,6 +49,4 @@ export default function TabLayout() {
           />
         </Tabs>
       )}
-    </>
-  );
-}
+    
