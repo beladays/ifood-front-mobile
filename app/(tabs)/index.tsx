@@ -2,10 +2,10 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Text } from '@rneui/themed';
 import axios from 'axios';
-import React, { useEffect, useState, useLayoutEffect } from 'react';
-import { Image, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native'
-import { Splash } from '../../components/Splash';
 import { useRouter } from 'expo-router';
+import React, { useEffect, useState } from 'react';
+import { Image, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Splash } from '../../components/Splash';
 ;
 
 type Loja = {
@@ -13,6 +13,7 @@ type Loja = {
   nome: string;
   urlImagem: string;
   categoria?: any;
+ 
 };
 
 type Categoria = {
@@ -198,10 +199,12 @@ export default function Principal() {
             <TouchableOpacity key={c.id} style={styles.categoryCard}>
               <View style={styles.categoryImageContainer}>
                 <Image
-                  source={{ uri: c.imagemUrl }}
-                  style={styles.categoryImage}
-                  resizeMode="cover"
-                />
+                    source={{ uri: c.urlImagem
+                    ? `http://localhost:8081${c.urlImagem.replace(/\\/g, "/")}`
+                    : "https://via.placeholder.com/100" }}
+                    style={styles.categoryImage}
+                    resizeMode="cover"
+                  />
               </View>
               <Text style={styles.categoryName}>{c.nome}</Text>
             </TouchableOpacity>
