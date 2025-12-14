@@ -6,14 +6,8 @@ import axios from 'axios';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Image, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
-import { Splash } from '../../components/Splash';
 
-
-<<<<<<< HEAD
-const API_BASE_URL = "http://192.168.1.7:8081";
-
-const API_BASE_URL = "http://192.168.0.106:8081";
->>>>>>> faad925d37efe24c76d9c01476b36ae2efe9546b
+const API_BASE_URL = "http://192.168.101.12:8081";
 
 
 type Loja = {
