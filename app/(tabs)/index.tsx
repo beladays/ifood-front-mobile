@@ -2,7 +2,7 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Text } from '@rneui/themed';
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useLayoutEffect } from 'react';
 import { Image, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native'
 import { Splash } from '../../components/Splash';
 import { useRouter } from 'expo-router';
@@ -38,6 +38,17 @@ export default function Principal() {
   const handleDataLoadComplete = () => {
     setLoading(false);
   };
+
+  //ESTADO DA ANIMAÇÃO//
+ useEffect(() => {
+  const tabNav = navigation.getParent();
+  if (tabNav) {
+    tabNav.setOptions({
+      tabBarStyle: { display: loading ? 'none' : 'flex' },
+    });
+  }
+}, [loading, navigation]);
+//=================================//
 
   // Carregar lojas
   useEffect(() => {
@@ -91,6 +102,8 @@ export default function Principal() {
     carregarCategorias();
   }, []);
 
+
+  
   // Animação/Splash
   if (loading) {
     return (
