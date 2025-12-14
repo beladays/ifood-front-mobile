@@ -4,7 +4,7 @@ import axios from "axios";
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from "react";
 import { ActivityIndicator, Alert, StyleSheet, Text, View } from "react-native";
-import { API_BASE_URL } from "..//app/config";
+import { API_BASE_URL } from "../app/config";
 
 export default function Perfil() {
   const [user, setUser] = useState<{ nome: string; email: string } | null>(null);
