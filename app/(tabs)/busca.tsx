@@ -1,37 +1,37 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { SearchBar } from '@rneui/themed';
+import axios from 'axios';
+import React, { useEffect, useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
+  Dimensions,
   FlatList,
   ImageBackground,
+  StyleSheet,
+  Text,
   TouchableOpacity,
-  Dimensions,
+  View,
 } from 'react-native';
 
 type Categoria = {
   id: number;
   nome: string;
-  imagemUrl: string;
+  urlImagem: string;
 };
 
 export default function Busca() {
   const [search, setSearch] = useState('');
   const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [loading, setLoading] = useState(true);
+
   const updateSearch = (text: string) => setSearch(text);
 
-  // chamar API 
+  // 🔹 Buscar categorias da API
   useEffect(() => {
     async function fetchCategorias() {
       try {
-        const response = await axios.get(
+        const response = await axios.get<Categoria[]>(
           'http://localhost:8081/categorias/restaurantes'
         );
-
-        setCategorias(response.data); 
+        setCategorias(response.data);
       } catch (error) {
         console.error('Erro ao buscar categorias:', error);
       } finally {
@@ -42,7 +42,7 @@ export default function Busca() {
     fetchCategorias();
   }, []);
 
-  // Filtra categorias por nome
+  // 🔹 Filtrar categorias pelo nome
   const categoriasFiltradas = categorias.filter((c) =>
     c.nome.toLowerCase().includes(search.toLowerCase())
   );
@@ -50,10 +50,15 @@ export default function Busca() {
   const screenWidth = Dimensions.get('window').width;
   const cardWidth = (screenWidth - 30) / 2;
 
+  // 🔹 Renderização do card
   const renderItem = ({ item }: { item: Categoria }) => (
     <TouchableOpacity style={[styles.card, { width: cardWidth }]}>
       <ImageBackground
-        source={{ uri: item.imagemUrl }}
+        source={{
+          uri: item.urlImagem
+            ? `http://localhost:8081${item.urlImagem}`
+            : 'https://via.placeholder.com/150',
+        }}
         style={styles.imagemFundo}
         imageStyle={{ borderRadius: 8 }}
       >
@@ -83,13 +88,24 @@ export default function Busca() {
         numColumns={2}
         columnWrapperStyle={styles.row}
         contentContainerStyle={{ paddingBottom: 20 }}
+        ListEmptyComponent={
+          !loading ? (
+            <Text style={{ textAlign: 'center', marginTop: 20 }}>
+              Nenhuma categoria encontrada
+            </Text>
+          ) : null
+        }
       />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f5f5f5', paddingHorizontal: 10 },
+  container: {
+    flex: 1,
+    backgroundColor: '#f5f5f5',
+    paddingHorizontal: 10,
+  },
   searchContainer: {
     backgroundColor: '#f5f5f5',
     borderTopWidth: 0,
