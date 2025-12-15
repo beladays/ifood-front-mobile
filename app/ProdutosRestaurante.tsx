@@ -31,7 +31,7 @@ interface Produto {
   ativo: boolean;
   urlImagem: string | null;
   categoria: Categoria;
-  idRestaurante: number; // Adicionado
+  idRestaurante: number;
 }
 
 interface Restaurante {
@@ -69,13 +69,10 @@ export default function ProdutosRestaurante() {
   async function carregarRestaurante() {
     try {
       const resp = await axios.get(`${API_BASE_URL}/restaurante/mobile`);
-      const restauranteEncontrado = resp.data.find(
+      const encontrado = resp.data.find(
         (r: Restaurante) => r.idRestaurante === Number(id)
       );
-
-      if (restauranteEncontrado) {
-        setRestaurante(restauranteEncontrado);
-      }
+      if (encontrado) setRestaurante(encontrado);
     } catch (error) {
       console.error("Erro ao carregar restaurante:", error);
     }
@@ -87,7 +84,6 @@ export default function ProdutosRestaurante() {
         `${API_BASE_URL}/produtos/restaurante/${id}`
       );
 
-      // Mapear idRestaurante nos produtos
       const produtosComRestaurante = resp.data.map((p: Produto) => ({
         ...p,
         idRestaurante: Number(id),
@@ -134,7 +130,24 @@ export default function ProdutosRestaurante() {
   /* ================= UI ================= */
   return (
     <View style={styles.container}>
-      <ScrollView showsVerticalScrollIndicator={false}>
+      {/* ===== TOP BAR ===== */}
+      <View style={styles.topBar}>
+        <TouchableOpacity
+          onPress={() => router.back()}
+          style={styles.backButton}
+        >
+          <Text style={styles.backIcon}>←</Text>
+        </TouchableOpacity>
+
+        <Text style={styles.topTitle} numberOfLines={1}>
+          {restaurante?.nome || "Restaurante"}
+        </Text>
+      </View>
+
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingTop: 56 }}
+      >
         {/* HEADER */}
         {restaurante && (
           <View style={styles.headerContainer}>
@@ -186,7 +199,10 @@ export default function ProdutosRestaurante() {
           {categorias.map((c) => (
             <TouchableOpacity
               key={c.id_categoria}
-              style={[styles.catItem, categoriaAtiva === c.id_categoria && styles.catAtiva]}
+              style={[
+                styles.catItem,
+                categoriaAtiva === c.id_categoria && styles.catAtiva,
+              ]}
               onPress={() => setCategoriaAtiva(c.id_categoria)}
             >
               <Text style={styles.catTexto}>{c.nome}</Text>
@@ -206,7 +222,9 @@ export default function ProdutosRestaurante() {
                 <View style={{ flex: 1 }}>
                   <Text style={styles.prodNome}>{p.nome}</Text>
                   <Text style={styles.prodDesc}>{p.descricao}</Text>
-                  <Text style={styles.prodPreco}>R$ {p.preco.toFixed(2)}</Text>
+                  <Text style={styles.prodPreco}>
+                    R$ {p.preco.toFixed(2)}
+                  </Text>
                 </View>
 
                 <View>
@@ -224,7 +242,10 @@ export default function ProdutosRestaurante() {
                       e.stopPropagation();
                       adicionar(p, Number(id));
                     }}
-                    style={styles.addButton}
+                    style={({ pressed }) => [
+                      styles.addButton,
+                      pressed && styles.addButtonPressed,
+                    ]}
                   >
                     <Text style={styles.addButtonText}>+</Text>
                   </Pressable>
@@ -242,28 +263,118 @@ export default function ProdutosRestaurante() {
   );
 }
 
+/* ================= STYLES ================= */
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#F8F8F8" },
+
+  /* TOP BAR */
+  topBar: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 56,
+    backgroundColor: "#fff",
+    justifyContent: "center",
+    alignItems: "center",
+    borderBottomWidth: 1,
+    borderBottomColor: "#eee",
+    zIndex: 10,
+    elevation: 4,
+  },
+
+  backButton: {
+    position: "absolute",
+    left: 16,
+  },
+
+  backIcon: {
+    fontSize: 24,
+    color: "#000000ff",
+    fontWeight: "600",
+  },
+
+  topTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#333",
+    maxWidth: "70%",
+    textAlign: "center",
+  },
+
   headerContainer: { height: 240 },
   headerImage: { width: "100%", height: "100%" },
-  headerOverlay: { position: "absolute", bottom: 0, height: "50%", width: "100%", backgroundColor: "rgba(0,0,0,0.6)" },
+  headerOverlay: {
+    position: "absolute",
+    bottom: 0,
+    height: "50%",
+    width: "100%",
+    backgroundColor: "rgba(0,0,0,0.6)",
+  },
   headerContent: { position: "absolute", bottom: 20, left: 20 },
+
   restaurantName: { fontSize: 26, color: "#fff", fontWeight: "700" },
   restaurantInfo: { flexDirection: "row", marginTop: 8 },
   infoText: { color: "#fff", fontWeight: "600" },
   infoDivider: { color: "#fff", marginHorizontal: 6 },
+
   searchContainer: { padding: 16 },
   input: { backgroundColor: "#eee", borderRadius: 8, padding: 12 },
-  catItem: { padding: 10, margin: 8, borderRadius: 20, borderWidth: 1, borderColor: "#ccc" },
-  catAtiva: { backgroundColor: "#EA1D2C" },
+
+  catItem: {
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    margin: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "#ccc",
+  },
+  catAtiva: { backgroundColor: "#EA1D2C", borderColor: "#EA1D2C" },
   catTexto: { color: "#000", fontWeight: "600" },
+
   produtosContainer: { padding: 16 },
-  prodCard: { backgroundColor: "#fff", borderRadius: 12, marginBottom: 16, padding: 12 },
+
+  prodCard: {
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    marginBottom: 16,
+    padding: 12,
+    elevation: 2,
+  },
   prodContent: { flexDirection: "row" },
+
   prodNome: { fontSize: 16, fontWeight: "700" },
   prodDesc: { color: "#666", marginVertical: 4 },
   prodPreco: { fontSize: 16, fontWeight: "700" },
+
   prodImg: { width: 120, height: 120, borderRadius: 8 },
-  addButton: { position: "absolute", bottom: -10, right: -10, backgroundColor: "#EA1D2C", width: 40, height: 40, borderRadius: 20, alignItems: "center", justifyContent: "center" },
-  addButtonText: { color: "#fff", fontSize: 22 },
+
+  addButton: {
+    position: "absolute",
+    bottom: -12,
+    right: -12,
+    backgroundColor: "#EA1D2C",
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 6,
+  },
+
+  addButtonPressed: {
+    transform: [{ scale: 0.92 }],
+    opacity: 0.85,
+  },
+
+  addButtonText: {
+    color: "#fff",
+    fontSize: 26,
+    fontWeight: "bold",
+    lineHeight: 28,
+  },
 });
