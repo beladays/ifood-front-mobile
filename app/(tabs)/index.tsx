@@ -7,7 +7,7 @@ import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Image, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 
-const API_BASE_URL = "http://192.168.101.12:8081";
+const API_BASE_URL = "http://192.168.1.7:8081";
 
 
 type Loja = {

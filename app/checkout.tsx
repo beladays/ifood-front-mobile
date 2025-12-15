@@ -42,21 +42,17 @@ export default function Checkout() {
 
       const payload = montarPayload();
       if (!payload) {
-        Alert.alert("Erro", "Sua sacola está vazia ou restaurante não definido");
+        Alert.alert("Erro", "Sua sacola está vazia");
         setLoading(false);
         return;
       }
 
-      await axios.post(
-        "http://localhost:8081/pedidos",
-        payload,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      await axios.post("http://localhost:8081/pedidos", payload, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
 
       setModalSucesso(true);
 
@@ -77,41 +73,55 @@ export default function Checkout() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.titulo}>Pagamento</Text>
+      {/* HEADER FIXO */}
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => router.push("/sacola")}>
+          <Text style={styles.voltarIcone}>←</Text>
+        </TouchableOpacity>
 
-      <View style={styles.card}>
-        <Text style={styles.subtitulo}>Escolha a forma de pagamento</Text>
+        <Text style={styles.titulo}>Pagamento</Text>
 
-        {(["PIX", "CARTAO", "DINHEIRO"] as MetodoPagamento[]).map((m) => (
-          <TouchableOpacity
-            key={m}
-            style={[
-              styles.opcao,
-              metodoPagamento === m && styles.opcaoSelecionada,
-            ]}
-            onPress={() => setMetodoPagamento(m)}
-          >
-            <Text style={styles.opcaoTexto}>{m}</Text>
-          </TouchableOpacity>
-        ))}
+        <View style={{ width: 40 }} />
       </View>
 
-      <View style={styles.footer}>
+      {/* CONTEÚDO */}
+      <View style={styles.content}>
+        <View style={styles.card}>
+          <Text style={styles.subtitulo}>Escolha a forma de pagamento</Text>
+
+          {(["PIX", "CARTAO", "DINHEIRO"] as MetodoPagamento[]).map((m) => (
+            <TouchableOpacity
+              key={m}
+              style={[
+                styles.opcao,
+                metodoPagamento === m && styles.opcaoSelecionada,
+              ]}
+              onPress={() => setMetodoPagamento(m)}
+            >
+              <Text style={styles.opcaoTexto}>{m}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </View>
+
+      {/* FOOTER FIXO (igual sacola) */}
+      <View style={styles.footerContainer}>
         <TouchableOpacity
-          style={styles.botao}
+          style={styles.botaoFinalizar}
           onPress={finalizarPedido}
           disabled={loading}
         >
           {loading ? (
             <ActivityIndicator color="#fff" />
           ) : (
-            <Text style={styles.botaoTexto}>
+            <Text style={styles.botaoFinalizarTexto}>
               Comprar • R$ {total.toFixed(2)}
             </Text>
           )}
         </TouchableOpacity>
       </View>
 
+      {/* MODAL */}
       <Modal visible={modalSucesso} transparent animationType="fade">
         <View style={styles.modalOverlay}>
           <View style={styles.modal}>
@@ -126,12 +136,53 @@ export default function Checkout() {
     </View>
   );
 }
-
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 24, backgroundColor: "#f8f8f8" },
-  titulo: { fontSize: 24, fontWeight: "700", marginBottom: 20 },
-  subtitulo: { fontSize: 16, marginBottom: 12 },
-  card: { backgroundColor: "#fff", padding: 16, borderRadius: 12 },
+  container: {
+    flex: 1,
+    backgroundColor: "#f8f8f8",
+  },
+
+  /* HEADER */
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    backgroundColor: "#fff",
+    borderBottomWidth: 1,
+    borderBottomColor: "#f0f0f0",
+  },
+
+  voltarIcone: {
+    fontSize: 28,
+    color: "#333",
+  },
+
+  titulo: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#1a1a1a",
+  },
+
+  /* CONTENT */
+  content: {
+    flex: 1,
+    padding: 24,
+  },
+
+  card: {
+    backgroundColor: "#fff",
+    padding: 16,
+    borderRadius: 12,
+  },
+
+  subtitulo: {
+    fontSize: 16,
+    marginBottom: 12,
+    fontWeight: "600",
+  },
+
   opcao: {
     padding: 16,
     borderRadius: 10,
@@ -139,27 +190,65 @@ const styles = StyleSheet.create({
     borderColor: "#eee",
     marginBottom: 10,
   },
+
   opcaoSelecionada: {
     borderColor: "#EA1D2C",
     backgroundColor: "#fff5f5",
   },
-  opcaoTexto: { fontSize: 16, fontWeight: "600" },
-  footer: { marginTop: "auto" },
-  botao: {
-    backgroundColor: "#EA1D2C",
+
+  opcaoTexto: {
+    fontSize: 16,
+    fontWeight: "600",
+  },
+
+  /* FOOTER FIXO */
+  footerContainer: {
     padding: 16,
+    backgroundColor: "#fff",
+    borderTopWidth: 1,
+    borderTopColor: "#f0f0f0",
+  },
+
+  botaoFinalizar: {
+    backgroundColor: "#EA1D2C",
+    paddingVertical: 16,
     borderRadius: 12,
     alignItems: "center",
   },
-  botaoTexto: { color: "#fff", fontSize: 18, fontWeight: "700" },
+
+  botaoFinalizarTexto: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "700",
+  },
+
+  /* MODAL */
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.6)",
     justifyContent: "center",
     alignItems: "center",
   },
-  modal: { backgroundColor: "#fff", padding: 32, borderRadius: 20, alignItems: "center" },
-  modalIcone: { fontSize: 64 },
-  modalTitulo: { fontSize: 22, fontWeight: "700", marginTop: 16 },
-  modalTexto: { textAlign: "center", marginTop: 8 },
+
+  modal: {
+    backgroundColor: "#fff",
+    padding: 32,
+    borderRadius: 20,
+    alignItems: "center",
+  },
+
+  modalIcone: {
+    fontSize: 64,
+  },
+
+  modalTitulo: {
+    fontSize: 22,
+    fontWeight: "700",
+    marginTop: 16,
+  },
+
+  modalTexto: {
+    textAlign: "center",
+    marginTop: 8,
+  },
 });
