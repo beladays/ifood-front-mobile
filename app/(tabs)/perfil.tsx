@@ -3,43 +3,68 @@ import { Avatar, Button, Card, Icon, ListItem } from "@rneui/themed";
 import axios from "axios";
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from "react";
-import { ActivityIndicator, Alert, StyleSheet, Text, View } from "react-native";
-import { API_BASE_URL } from '../config'; // ✅ import do config
+import {
+  ActivityIndicator,
+  Alert,
+  StyleSheet,
+  Text,
+  View
+} from "react-native";
+import { API_BASE_URL } from '../config';
+
+type User = {
+  nome: string;
+  email: string;
+};
 
 export default function Perfil() {
-  const [user, setUser] = useState<{ nome: string; email: string; } | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
-    async function carregarPerfil() {
-      try {
-        const token = await AsyncStorage.getItem("token"); 
-        if (!token) {
-          Alert.alert("Erro", "Usuário não autenticado.");
-          router.replace('/login');
-          return;
-        }
-
-        const response = await axios.get(`${API_BASE_URL}/perfil`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        const data = response.data;
-        setUser({
-          nome: data.nome,
-          email: data.email
-        });
-      } catch (error) {
-        console.error("Erro ao carregar perfil:", error);
-        Alert.alert("Erro", "Não foi possível carregar o perfil.");
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    carregarPerfil();
+    verificarAuth();
   }, []);
+
+  async function verificarAuth() {
+    try {
+      const token = await AsyncStorage.getItem("token");
+
+      if (!token) {
+        router.replace('/login');
+        return;
+      }
+
+      const response = await axios.get(`${API_BASE_URL}/perfil`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setUser({
+        nome: response.data.nome,
+        email: response.data.email,
+      });
+    } catch (error) {
+      console.error(error);
+      Alert.alert("Erro", "Sessão expirada. Faça login novamente.");
+      await AsyncStorage.removeItem("token");
+      router.replace('/login');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleLogout() {
+    try {
+      await AsyncStorage.removeItem("token");
+      delete axios.defaults.headers.common['Authorization'];
+      setUser(null);
+      router.replace('/login');
+    } catch {
+      Alert.alert("Erro", "Não foi possível sair da conta");
+    }
+  }
 
   if (loading) {
     return (
@@ -50,24 +75,20 @@ export default function Perfil() {
     );
   }
 
-  if (!user) {
-    return (
-      <View style={styles.center}>
-        <Text>Erro ao carregar dados do usuário</Text>
-      </View>
-    );
-  }
-
   return (
     <View style={styles.container}>
       <Card containerStyle={styles.card}>
         <View style={styles.avatarContainer}>
           <View style={styles.avatarCircle}>
-            <Text style={styles.avatarText}>{user.nome[0]?.toUpperCase()}</Text>
+            <Text style={styles.avatarText}>
+              {user?.nome.charAt(0).toUpperCase()}
+            </Text>
           </View>
-          <Avatar size={100} rounded containerStyle={{ marginBottom: 15 }} />
-          <Text style={styles.name}>{user.nome}</Text>
-          <Text style={styles.email}>{user.email}</Text>
+
+          <Avatar rounded size={100} />
+
+          <Text style={styles.name}>{user?.nome}</Text>
+          <Text style={styles.email}>{user?.email}</Text>
         </View>
       </Card>
 
@@ -89,24 +110,64 @@ export default function Perfil() {
 
       <Button
         title="Sair"
-        onPress={async () => {
-          await AsyncStorage.removeItem("token");
-          router.replace('/login');
-        }}
-        buttonStyle={{ backgroundColor: "#E91E63", borderRadius: 8, width: 200 }}
-        containerStyle={{ marginTop: 20, alignItems: "center" }}
+        onPress={handleLogout}
+        buttonStyle={styles.logoutButton}
+        containerStyle={styles.logoutContainer}
       />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: "center", backgroundColor: "#fff" },
-  center: { flex: 1, justifyContent: "center", alignItems: "center" },
-  card: { borderRadius: 10, padding: 20, shadowOpacity: 0.1, elevation: 5 },
-  avatarContainer: { alignItems: "center" },
-  name: { fontSize: 22, fontWeight: "bold", marginTop: 10 },
-  email: { fontSize: 16, color: "#555", marginTop: 4 },
-  avatarText: { fontSize: 36, fontWeight: "bold", color: "#d32f2f" },
-  avatarCircle: { width: 90, height: 90, borderRadius: 45, backgroundColor: "#fde4e4", alignItems: "center", justifyContent: "center", marginBottom: 15 },
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+    justifyContent: "center",
+  },
+  center: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  card: {
+    borderRadius: 10,
+    padding: 20,
+    elevation: 5,
+  },
+  avatarContainer: {
+    alignItems: "center",
+  },
+  avatarCircle: {
+    width: 90,
+    height: 90,
+    borderRadius: 45,
+    backgroundColor: "#fde4e4",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 15,
+  },
+  avatarText: {
+    fontSize: 36,
+    fontWeight: "bold",
+    color: "#d32f2f",
+  },
+  name: {
+    fontSize: 22,
+    fontWeight: "bold",
+    marginTop: 10,
+  },
+  email: {
+    fontSize: 16,
+    color: "#555",
+    marginTop: 4,
+  },
+  logoutButton: {
+    backgroundColor: "#E91E63",
+    borderRadius: 8,
+    width: 200,
+  },
+  logoutContainer: {
+    marginTop: 20,
+    alignItems: "center",
+  },
 });
