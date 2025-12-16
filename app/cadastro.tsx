@@ -2,36 +2,65 @@ import { Button, Input, Text } from '@rneui/themed';
 import axios from 'axios';
 import { Link, useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { StyleSheet, View } from 'react-native';
-import { API_BASE_URL } from '../app/config'; // ✅ import
+import { ScrollView, StyleSheet, View } from 'react-native';
+import { API_BASE_URL } from '../app/config';
 
 export default function Cadastro() {
-  const [username, setUsername] = useState('');
+  const router = useRouter();
+
+  const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
+  const [confirmarSenha, setConfirmarSenha] = useState('');
+  const [cpf, setCpf] = useState('');
+  const [dtNascimento, setDtNascimento] = useState('');
+  const [foneCelular, setFoneCelular] = useState('');
+
+  const [rua, setRua] = useState('');
+  const [numero, setNumero] = useState('');
+  const [bairro, setBairro] = useState('');
+  const [cidade, setCidade] = useState('');
+  const [estado, setEstado] = useState('');
+  const [cep, setCep] = useState('');
+
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState('');
   const [sucesso, setSucesso] = useState('');
-  const router = useRouter();
 
   const handleCadastro = async () => {
     setErro('');
     setSucesso('');
+
+    // 🔒 Validação de senha
+    if (senha !== confirmarSenha) {
+      setErro('As senhas não coincidem');
+      return;
+    }
+
     setLoading(true);
 
     try {
       const response = await axios.post(`${API_BASE_URL}/auth/registro`, {
-        username,
+        nome,
         email,
         password: senha,
+        cpf,
+        dt_nascimento: dtNascimento, // dd-MM-yyyy
+        fone_celular: foneCelular,
+        endereco: {
+          rua,
+          numero,
+          bairro,
+          cidade,
+          estado,
+          cep,
+        },
       });
 
       console.log('Usuário cadastrado:', response.data);
       setSucesso('Cadastro realizado com sucesso!');
 
-      // Redireciona para login após 1s
       setTimeout(() => router.push('/login'), 1000);
-
     } catch (err: any) {
       console.log(err.response?.data || err.message);
       setErro(err.response?.data?.message || 'Erro ao cadastrar usuário');
@@ -41,10 +70,11 @@ export default function Cadastro() {
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
       <Text h3 style={styles.title}>Criar Conta</Text>
 
-      <Input placeholder="Nome de usuário" value={username} onChangeText={setUsername} />
+      <Input placeholder="Nome completo" value={nome} onChangeText={setNome} />
+
       <Input
         placeholder="Email"
         value={email}
@@ -52,7 +82,54 @@ export default function Cadastro() {
         autoCapitalize="none"
         keyboardType="email-address"
       />
-      <Input placeholder="Senha" value={senha} onChangeText={setSenha} secureTextEntry />
+
+      <Input
+        placeholder="Senha"
+        value={senha}
+        onChangeText={setSenha}
+        secureTextEntry
+      />
+
+      <Input
+        placeholder="Confirmar senha"
+        value={confirmarSenha}
+        onChangeText={setConfirmarSenha}
+        secureTextEntry
+      />
+
+      <Input
+        placeholder="CPF"
+        value={cpf}
+        onChangeText={setCpf}
+        keyboardType="numeric"
+      />
+
+      <Input
+        placeholder="Data de nascimento (dd-MM-yyyy)"
+        value={dtNascimento}
+        onChangeText={setDtNascimento}
+      />
+
+      <Input
+        placeholder="Celular"
+        value={foneCelular}
+        onChangeText={setFoneCelular}
+        keyboardType="phone-pad"
+      />
+
+      <Text h4 style={styles.sectionTitle}>Endereço</Text>
+
+      <Input placeholder="Rua" value={rua} onChangeText={setRua} />
+      <Input placeholder="Número" value={numero} onChangeText={setNumero} />
+      <Input placeholder="Bairro" value={bairro} onChangeText={setBairro} />
+      <Input placeholder="Cidade" value={cidade} onChangeText={setCidade} />
+      <Input placeholder="Estado" value={estado} onChangeText={setEstado} />
+      <Input
+        placeholder="CEP"
+        value={cep}
+        onChangeText={setCep}
+        keyboardType="numeric"
+      />
 
       {erro ? <Text style={styles.error}>{erro}</Text> : null}
       {sucesso ? <Text style={styles.success}>{sucesso}</Text> : null}
@@ -72,25 +149,29 @@ export default function Cadastro() {
           </Link>
         </Text>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    justifyContent: 'center',
     padding: 24,
     backgroundColor: '#fff',
   },
   title: {
     textAlign: 'center',
-    marginBottom: 32,
+    marginBottom: 24,
+  },
+  sectionTitle: {
+    marginTop: 16,
+    marginBottom: 8,
+    fontWeight: 'bold',
   },
   button: {
     backgroundColor: '#E60014',
     borderRadius: 8,
     paddingVertical: 12,
+    marginTop: 10,
   },
   error: {
     color: 'red',
