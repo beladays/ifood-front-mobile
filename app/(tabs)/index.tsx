@@ -7,8 +7,7 @@ import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Image, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 
-const API_BASE_URL = "http://192.168.1.7:8081";
-
+const API_BASE_URL = "http://192.168.101.12:8081";
 
 type Loja = {
   idRestaurante: number;
@@ -36,7 +35,6 @@ export default function Principal() {
   const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [categoriaSelecionada, setCategoriaSelecionada] = useState<number | null>(null);
   const router = useRouter();
-
 
   // Carregar lojas
   useEffect(() => {
@@ -90,11 +88,20 @@ export default function Principal() {
     carregarCategorias();
   }, []);
 
-
-  // Filtrar lojas pelo categoria selecionada
+  // Filtrar lojas pela categoria selecionada
   const lojasFiltradas = categoriaSelecionada
     ? lojas.filter((l) => l.categoria?.id === categoriaSelecionada)
     : lojas;
+
+  // Função para lidar com a seleção da categoria
+  const handleCategoriaClick = (categoriaId: number) => {
+    // Se a categoria já foi selecionada, reseta o filtro
+    if (categoriaId === categoriaSelecionada) {
+      setCategoriaSelecionada(null); // Mostrar todas as lojas
+    } else {
+      setCategoriaSelecionada(categoriaId); // Filtrar por categoria
+    }
+  };
 
   return (
     <ScrollView style={styles.container}>
@@ -107,7 +114,6 @@ export default function Principal() {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.promoScroll}
         >
-
           <View style={styles.promoCard}>
             <Image
               style={styles.promoImage}
@@ -116,7 +122,6 @@ export default function Principal() {
                 uri: 'https://raw.githubusercontent.com/ViniciusX22/onebitfood/master/public/images/categories/japonese.jpeg',
               }}
             />
-
           </View>
           <View style={styles.promoCard}>
             <Image
@@ -127,8 +132,7 @@ export default function Principal() {
               }}
             />
           </View>
-
-           <View style={styles.promoCard}>
+          <View style={styles.promoCard}>
             <Image
               style={styles.promoImage}
               resizeMode="cover"
@@ -137,9 +141,7 @@ export default function Principal() {
               }}
             />
           </View>
-          
-
-           <View style={styles.promoCard}>
+          <View style={styles.promoCard}>
             <Image
               style={styles.promoImage}
               resizeMode="cover"
@@ -148,9 +150,7 @@ export default function Principal() {
               }}
             />
           </View>
-          
-
-           <View style={styles.promoCard}>
+          <View style={styles.promoCard}>
             <Image
               style={styles.promoImage}
               resizeMode="cover"
@@ -159,11 +159,6 @@ export default function Principal() {
               }}
             />
           </View>
-
-          
-          
-          
-
         </ScrollView>
       </View>
 
@@ -179,7 +174,7 @@ export default function Principal() {
             <TouchableOpacity
               key={c.id}
               style={styles.categoryCard}
-              onPress={() => setCategoriaSelecionada(c.id)}
+              onPress={() => handleCategoriaClick(c.id)}
             >
               <View style={styles.categoryImageContainer}>
                 <Image
