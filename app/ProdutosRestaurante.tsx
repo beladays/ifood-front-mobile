@@ -132,12 +132,9 @@ export default function ProdutosRestaurante() {
     <View style={styles.container}>
       {/* ===== TOP BAR ===== */}
       <View style={styles.topBar}>
-        <TouchableOpacity
-          onPress={() => router.back()}
-          style={styles.backButton}
-        >
-          <Text style={styles.backIcon}>←</Text>
-        </TouchableOpacity>
+        <TouchableOpacity onPress={() => router.push("/")}>
+    <Text style={styles.backButton}>←</Text>
+  </TouchableOpacity>
 
         <Text style={styles.topTitle} numberOfLines={1}>
           {restaurante?.nome || "Restaurante"}
@@ -282,17 +279,15 @@ const styles = StyleSheet.create({
     zIndex: 10,
     elevation: 4,
   },
+  
 
   backButton: {
     position: "absolute",
-    left: 16,
+    left: -300,
+    fontSize: 28,
   },
 
-  backIcon: {
-    fontSize: 24,
-    color: "#000000ff",
-    fontWeight: "600",
-  },
+ 
 
   topTitle: {
     fontSize: 18,

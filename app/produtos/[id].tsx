@@ -98,37 +98,11 @@ export default function DetalheProduto() {
         </View>
       </ScrollView>
 
-      {/* ===== FOOTER ===== */}
-      <View style={styles.footer}>
-        <View style={styles.quantidadeContainer}>
-          <TouchableOpacity
-            style={[
-              styles.qtdBotao,
-              quantidade === 1 && styles.qtdBotaoDisabled,
-            ]}
-            onPress={diminuir}
-            disabled={quantidade === 1}
-          >
-            <Text style={styles.qtdTexto}>−</Text>
-          </TouchableOpacity>
-
-          <Text style={styles.qtdNumero}>{quantidade}</Text>
-
-          <TouchableOpacity style={styles.qtdBotao} onPress={aumentar}>
-            <Text style={styles.qtdTexto}>+</Text>
-          </TouchableOpacity>
         </View>
 
-        <TouchableOpacity
-          style={styles.botaoAdd}
-          onPress={() => adicionar(produto, quantidade)}
-        >
-          <Text style={styles.botaoTexto}>
-            Adicionar • R$ {valorTotal.toFixed(2)}
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+  
+     
+    
   );
 }
 

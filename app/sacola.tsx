@@ -1,11 +1,52 @@
 import { useRouter } from "expo-router";
-import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  Alert,
+} from "react-native";
+import React, { useState, useEffect } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 import { useSacola } from "../context/SacolaContext";
 import { API_BASE_URL } from "./config";
 
 export default function Sacola() {
   const { itens, adicionar, remover, total } = useSacola();
   const router = useRouter();
+  const [irParaLogin, setIrParaLogin] = useState(false);
+
+  // redireciona para login
+  useEffect(() => {
+    if (irParaLogin) {
+      router.push({
+        pathname: "/login",
+        params: { redirect: "/sacola" },
+      });
+      setIrParaLogin(false);
+    }
+  }, [irParaLogin]);
+
+  const handleFinalizarPedido = async () => {
+    const token = await AsyncStorage.getItem("token");
+
+    if (!token) {
+      Alert.alert(
+        "Login necessário",
+        "Você precisa estar logado para finalizar o pedido.",
+        [
+          { text: "Cancelar", style: "cancel" },
+          { text: "Entrar", onPress: () => setIrParaLogin(true) },
+        ]
+      );
+      return;
+    }
+
+    router.push("/checkout");
+  };
 
   if (itens.length === 0) {
     return (
@@ -15,7 +56,7 @@ export default function Sacola() {
         <Text style={styles.vazioSub}>
           Adicione produtos do cardápio para começar seu pedido
         </Text>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.botaoVoltar}
           onPress={() => router.back()}
         >
@@ -24,14 +65,13 @@ export default function Sacola() {
       </View>
     );
   }
-
   return (
     <View style={styles.container}>
       {/* HEADER */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <Text style={styles.voltarIcone}>←</Text>
-        </TouchableOpacity>
+         <TouchableOpacity onPress={() => router.push("/")}>
+    <Text style={styles.voltarIcone}>←</Text>
+  </TouchableOpacity>
         <Text style={styles.titulo}>Sacola</Text>
         <View style={{ width: 40 }} />
       </View>
@@ -99,7 +139,8 @@ export default function Sacola() {
       <View style={styles.footerContainer}>
         <TouchableOpacity 
           style={styles.botaoFinalizar}
-          onPress={() => router.push("/checkout")}
+          onPress={handleFinalizarPedido}
+
         >
           <Text style={styles.botaoFinalizarTexto}>
             Finalizar pedido • R$ {total.toFixed(2)}

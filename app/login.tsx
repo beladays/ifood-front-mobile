@@ -5,6 +5,8 @@ import { Link, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { API_BASE_URL } from '../app/config';
+import { useLocalSearchParams } from "expo-router";
+
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -12,6 +14,8 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState('');
   const router = useRouter();
+  const { redirect } = useLocalSearchParams<{ redirect?: string }>();
+
 
   const handleLogin = async () => {
     setErro('');
@@ -30,7 +34,15 @@ export default function Login() {
       await AsyncStorage.setItem('token', token);
 
       // Navegar pra tela principal
-      router.push('/');
+const target =
+  typeof redirect === "string"
+    ? redirect
+    : Array.isArray(redirect)
+    ? redirect[0]
+    : "/";
+
+router.replace(target);
+
 
     } catch (err: any) {
       console.log(err.response?.data || err.message);
