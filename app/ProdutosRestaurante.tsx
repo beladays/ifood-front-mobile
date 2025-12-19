@@ -2,22 +2,13 @@ import { useRoute } from "@react-navigation/native";
 import axios from "axios";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
-import {
-  Image,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import {Image,Pressable, ScrollView,  StyleSheet, Text, TextInput, TouchableOpacity, View,} from "react-native";
 
 import { API_BASE_URL } from "../app/config";
 import SacolaFlutuante from "../components/botSacola";
 import { useSacola } from "../context/SacolaContext";
 
-/* ================= INTERFACES ================= */
+/* INTERFACES */
 interface Categoria {
   id_categoria: number;
   nome: string;
@@ -51,7 +42,7 @@ interface RouteParams {
   id: string | number;
 }
 
-/* ================= COMPONENT ================= */
+/* componen*/
 export default function ProdutosRestaurante() {
   const route = useRoute();
   const { id } = route.params as RouteParams;
@@ -65,7 +56,7 @@ export default function ProdutosRestaurante() {
   const router = useRouter();
   const { adicionar } = useSacola();
 
-  /* ================= API ================= */
+  /* api*/
   async function carregarRestaurante() {
     try {
       const resp = await axios.get(`${API_BASE_URL}/restaurante/mobile`);
@@ -114,7 +105,7 @@ export default function ProdutosRestaurante() {
     carregarProdutos();
   }, []);
 
-  /* ================= FILTROS ================= */
+  /* filtrar */
   const produtosFiltrados = produtos.filter((p) => {
     const matchCategoria =
       categoriaAtiva === null ||
@@ -127,10 +118,10 @@ export default function ProdutosRestaurante() {
     return matchCategoria && matchBusca;
   });
 
-  /* ================= UI ================= */
+  /* UI */
   return (
     <View style={styles.container}>
-      {/* ===== TOP BAR ===== */}
+      {/*top*/}
       <View style={styles.topBar}>
         <TouchableOpacity onPress={() => router.push("/")}>
     <Text style={styles.backButton}>←</Text>
@@ -260,11 +251,11 @@ export default function ProdutosRestaurante() {
   );
 }
 
-/* ================= STYLES ================= */
+/* css*/
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#F8F8F8" },
 
-  /* TOP BAR */
+  /* TOP*/
   topBar: {
     position: "absolute",
     top: 0,

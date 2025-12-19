@@ -3,13 +3,7 @@ import { Card } from "@rneui/themed";
 import axios from "axios";
 import { Link } from "expo-router";
 import React, { useEffect, useState } from "react";
-import {
-  ActivityIndicator,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import {ActivityIndicator,ScrollView,StyleSheet,Text,View,} from "react-native";
 import { API_BASE_URL } from "../config";
 
 type Pedido = {
@@ -86,7 +80,7 @@ export default function Pedidos() {
 
       {/* Conteúdo rolável */}
       <ScrollView
-        style={{ flex: 1 }}                 // 👈 ESSENCIAL PARA O SCROLL
+        style={{ flex: 1 }}                 
         contentContainerStyle={{ paddingBottom: 24 }}
         showsVerticalScrollIndicator={false}
       >

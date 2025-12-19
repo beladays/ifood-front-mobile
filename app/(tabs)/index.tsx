@@ -232,7 +232,7 @@ export default function Principal() {
   );
 }
 
-// (mantém seu StyleSheet exatamente igual)
+// css
 const styles = StyleSheet.create({
   container: {
     flex: 1,

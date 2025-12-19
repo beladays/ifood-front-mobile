@@ -1,20 +1,11 @@
 import axios from 'axios';
 import { Link, useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-  KeyboardAvoidingView,
-  Platform,
-} from 'react-native';
+import {ScrollView,StyleSheet,Text,TextInput,TouchableOpacity,View,KeyboardAvoidingView,Platform,} from 'react-native';
 import { API_BASE_URL } from '../app/config';
 
-/* ========= UTILS ========= */
-const onlyNumbers = (value: string) => value.replace(/\D/g, '');
+
+const onlyNumbers = (value: string) => value.replace(/\D/g, ''); 
 
 export default function Cadastro() {
   const router = useRouter();
@@ -220,7 +211,7 @@ export default function Cadastro() {
   );
 }
 
-/* ========= STYLES ========= */
+/* css */
 const styles = StyleSheet.create({
   page: {
     padding: 20,

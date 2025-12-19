@@ -33,13 +33,13 @@ export default function Login() {
       // Salvar o token no AsyncStorage
       await AsyncStorage.setItem('token', token);
 
-      // Navegar pra tela principal
+      // pra onde vai dps de logar
 const target =
   typeof redirect === "string"
     ? redirect
     : Array.isArray(redirect)
     ? redirect[0]
-    : "/";
+    : "/"; //login
 
 router.replace(target);
 

@@ -2,15 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
-import {
-  ActivityIndicator,
-  Alert,
-  Modal,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import {ActivityIndicator,Alert,Modal,StyleSheet,Text, TouchableOpacity, View,} from "react-native";
 import { useSacola } from "../context/SacolaContext";
 
 type MetodoPagamento = "PIX" | "CARTAO" | "DINHEIRO";

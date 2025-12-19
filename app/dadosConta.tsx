@@ -3,16 +3,7 @@ import { Button, Card, Icon } from "@rneui/themed";
 import axios from "axios";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
-import {
-  ActivityIndicator,
-  Alert,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import {ActivityIndicator,Alert,ScrollView,StyleSheet,Text,TextInput,TouchableOpacity,View,} from "react-native";
 import { API_BASE_URL } from "../app/config";
 
 export default function DadosConta() {
@@ -153,7 +144,7 @@ export default function DadosConta() {
   );
 }
 
-// ... estilos permanecem iguais
+
 
 
 const styles = StyleSheet.create({

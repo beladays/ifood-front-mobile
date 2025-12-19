@@ -3,20 +3,10 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { SearchBar } from '@rneui/themed';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import {
-  Dimensions,
-  FlatList,
-  ImageBackground,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import {Dimensions,FlatList,ImageBackground,StyleSheet,Text,TouchableOpacity,View,} from 'react-native';
 import { API_BASE_URL } from '../config';
 
-/* =======================
-   TIPOS
-======================= */
+/*tipos */
 type Restaurante = {
   idRestaurante: number;
   nome: string;
@@ -33,9 +23,7 @@ type RootStackParamList = {
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
-/* =======================
-   COMPONENTE
-======================= */
+/*component*/
 export default function Busca() {
   const navigation = useNavigation<NavigationProp>();
 
@@ -45,9 +33,7 @@ export default function Busca() {
 
   const updateSearch = (text: string) => setSearch(text);
 
-  /* =======================
-     BUSCAR RESTAURANTES
-  ======================= */
+  /* buscar por rest */
   useEffect(() => {
     async function fetchRestaurantes() {
       try {
@@ -79,9 +65,7 @@ export default function Busca() {
     fetchRestaurantes();
   }, []);
 
-  /* =======================
-     FILTRO
-  ======================= */
+  /* filtros */
   const restaurantesFiltrados = restaurantes.filter((r) =>
     r.nome.toLowerCase().includes(search.toLowerCase())
   );
@@ -89,9 +73,7 @@ export default function Busca() {
   const screenWidth = Dimensions.get('window').width;
   const cardWidth = (screenWidth - 30) / 2;
 
-  /* =======================
-     ITEM
-  ======================= */
+  /* por item*/
   const renderItem = ({ item }: { item: Restaurante }) => (
     <TouchableOpacity
       style={[styles.card, { width: cardWidth }]}
@@ -119,9 +101,7 @@ export default function Busca() {
     </TouchableOpacity>
   );
 
-  /* =======================
-     RENDER
-  ======================= */
+  /* renderiza */
   return (
     <View style={styles.container}>
       <SearchBar
@@ -153,9 +133,7 @@ export default function Busca() {
   );
 }
 
-/* =======================
-   ESTILOS
-======================= */
+/* css */
 const styles = StyleSheet.create({
   container: {
     flex: 1,

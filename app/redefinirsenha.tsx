@@ -100,7 +100,7 @@ export default function RedefinirSenha() {
   );
 }
 
-/* ================= STYLES ================= */
+/* css*/
 const styles = StyleSheet.create({
   container: {
     flex: 1,

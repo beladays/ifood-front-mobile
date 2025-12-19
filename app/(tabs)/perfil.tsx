@@ -3,13 +3,7 @@ import { Avatar, Button, Card, Icon, ListItem } from "@rneui/themed";
 import axios from "axios";
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from "react";
-import {
-  ActivityIndicator,
-  Alert,
-  StyleSheet,
-  Text,
-  View
-} from "react-native";
+import {ActivityIndicator,Alert,StyleSheet,Text,View} from "react-native";
 import { API_BASE_URL } from '../config';
 
 type User = {

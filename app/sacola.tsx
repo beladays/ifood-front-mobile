@@ -1,13 +1,5 @@
 import { useRouter } from "expo-router";
-import {
-  Image,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-  Alert,
-} from "react-native";
+import {Image,ScrollView,StyleSheet,Text,TouchableOpacity,View,Alert,} from "react-native";
 import React, { useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 

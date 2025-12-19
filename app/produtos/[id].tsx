@@ -1,15 +1,7 @@
 import axios from "axios";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
-import {
-  ActivityIndicator,
-  Image,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import {ActivityIndicator,Image,ScrollView,StyleSheet,Text,TouchableOpacity,View,} from "react-native";
 import { useSacola } from "../../context/SacolaContext";
 import { API_BASE_URL } from "../config";
 
@@ -106,7 +98,7 @@ export default function DetalheProduto() {
   );
 }
 
-/* ================= STYLES ================= */
+/* css*/
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fff" },
 
