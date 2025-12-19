@@ -3,7 +3,15 @@ import { Button, Icon, ListItem } from "@rneui/themed";
 import axios from "axios";
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from "react";
-import { ActivityIndicator, Alert, ScrollView, StatusBar, StyleSheet, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  Alert,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  View
+} from "react-native";
 import { API_BASE_URL } from '../config';
 
 type User = {
@@ -25,7 +33,7 @@ export default function Perfil() {
       const token = await AsyncStorage.getItem("token");
 
       if (!token) {
-        router.replace('/login');
+        router.replace("/login");
         return;
       }
 
@@ -42,38 +50,22 @@ export default function Perfil() {
     } catch (error) {
       console.error(error);
       Alert.alert("Erro", "Sessão expirada. Faça login novamente.");
-      await AsyncStorage.removeItem("token");
-      router.replace('/login');
+      await AsyncStorage.clear();
+      router.replace("/login");
     } finally {
       setLoading(false);
     }
   }
 
   async function handleLogout() {
-    Alert.alert(
-      "Sair da conta",
-      "Tem certeza que deseja sair?",
-      [
-        {
-          text: "Cancelar",
-          style: "cancel"
-        },
-        {
-          text: "Sair",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              await AsyncStorage.removeItem("token");
-              delete axios.defaults.headers.common['Authorization'];
-              setUser(null);
-              router.replace('/login');
-            } catch {
-              Alert.alert("Erro", "Não foi possível sair da conta");
-            }
-          }
-        }
-      ]
-    );
+    try {
+      await AsyncStorage.removeItem("token");
+      delete axios.defaults.headers.common['Authorization'];
+      setUser(null);
+      router.replace('/login');
+    } catch {
+      Alert.alert("Erro", "Não foi possível sair da conta");
+    }
   }
 
   if (loading) {
@@ -91,22 +83,23 @@ export default function Perfil() {
       title: "Dados da conta",
       subtitle: "Edite suas informações pessoais",
       route: "/dadosConta",
-      color: "#E60014"
+      color: "#E60014",
     },
     {
       icon: "location-on",
       title: "Endereços",
       subtitle: "Gerencie seus endereços de entrega",
       route: "/endereco",
-      color: "#E60014"
+      color: "#E60014",
     },
   ];
 
   return (
     <>
       <StatusBar barStyle="light-content" backgroundColor="#E60014" />
+
       <ScrollView style={styles.container}>
-        {/* Header com gradiente visual */}
+        {/* HEADER */}
         <View style={styles.header}>
           <View style={styles.headerContent}>
             <View style={styles.avatarContainer}>
@@ -116,15 +109,16 @@ export default function Perfil() {
                 </Text>
               </View>
             </View>
+
             <Text style={styles.name}>{user?.nome}</Text>
             <Text style={styles.email}>{user?.email}</Text>
           </View>
         </View>
 
-        {/* Menu de opções */}
+        {/* MENU */}
         <View style={styles.menuContainer}>
           <Text style={styles.sectionTitle}>Minha Conta</Text>
-          
+
           {menuItems.map((item, index) => (
             <ListItem
               key={index}
@@ -132,14 +126,20 @@ export default function Perfil() {
               containerStyle={styles.listItem}
               bottomDivider
             >
-              <View style={[styles.iconContainer, { backgroundColor: `${item.color}15` }]}>
-                <Icon 
-                  name={item.icon} 
-                  type="material" 
-                  color={item.color} 
-                  size={22} 
+              <View
+                style={[
+                  styles.iconContainer,
+                  { backgroundColor: `${item.color}15` },
+                ]}
+              >
+                <Icon
+                  name={item.icon}
+                  type="material"
+                  color={item.color}
+                  size={22}
                 />
               </View>
+
               <ListItem.Content>
                 <ListItem.Title style={styles.listTitle}>
                   {item.title}
@@ -148,36 +148,27 @@ export default function Perfil() {
                   {item.subtitle}
                 </ListItem.Subtitle>
               </ListItem.Content>
-              <Icon 
-                name="chevron-right" 
-                type="material" 
-                color="#ccc" 
-                size={24} 
+
+              <Icon
+                name="chevron-right"
+                type="material"
+                color="#ccc"
+                size={24}
               />
             </ListItem>
           ))}
         </View>
 
-        {/* Botão de sair */}
+        {/* LOGOUT */}
         <View style={styles.logoutContainer}>
           <Button
             title="Sair da conta"
             onPress={handleLogout}
             buttonStyle={styles.logoutButton}
             titleStyle={styles.logoutTitle}
-            icon={
-              <Icon
-                name="logout"
-                type="material"
-                color="#E60014"
-                size={20}
-                style={{ marginRight: 8 }}
-              />
-            }
           />
         </View>
 
-        {/* Versão do app */}
         <Text style={styles.version}>Versão 1.0.0</Text>
       </ScrollView>
     </>
@@ -210,7 +201,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   avatarContainer: {
-    position: "relative",
     marginBottom: 16,
   },
   avatarCircle: {
@@ -220,10 +210,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
     elevation: 4,
   },
   avatarText: {
@@ -231,24 +217,10 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: "#E60014",
   },
-  editBadge: {
-    position: "absolute",
-    bottom: 0,
-    right: 0,
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: "#E60014",
-    borderWidth: 3,
-    borderColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
   name: {
     fontSize: 24,
     fontWeight: "700",
     color: "#fff",
-    marginBottom: 4,
   },
   email: {
     fontSize: 15,
@@ -262,14 +234,8 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "700",
     color: "#717171",
-    textTransform: "uppercase",
-    letterSpacing: 0.5,
     paddingHorizontal: 24,
     paddingVertical: 12,
-    backgroundColor: "#f5f5f5",
-  },
-  sectionSpacing: {
-    marginTop: 16,
   },
   listItem: {
     backgroundColor: "#fff",
@@ -287,8 +253,6 @@ const styles = StyleSheet.create({
   listTitle: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#1a1a1a",
-    marginBottom: 4,
   },
   listSubtitle: {
     fontSize: 13,
