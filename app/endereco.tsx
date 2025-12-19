@@ -3,7 +3,15 @@ import { Button, Card, Input } from "@rneui/themed";
 import axios from "axios";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  Alert,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 
 export type Endereco = {
@@ -26,6 +34,7 @@ export default function EnderecoScreen() {
     estado: "",
     cep: "",
   });
+
   const [loading, setLoading] = useState(true);
   const [editavel, setEditavel] = useState(false);
 
@@ -33,30 +42,29 @@ export default function EnderecoScreen() {
     setEndereco((prev) => ({ ...prev, [campo]: valor }));
   };
 
-  // Função para carregar endereço do servidor
+  // 🔥 BUSCA SOMENTE DO BACKEND
   const carregarEndereco = async () => {
     try {
       setLoading(true);
+
       const token = await AsyncStorage.getItem("token");
-      if (!token) return;
-      const response = await axios.get("http://localhost:8081/endereco", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (response.data) {
-        setEndereco(response.data); // atualiza estado
-        await AsyncStorage.setItem("endereco", JSON.stringify(response.data)); // salva localmente
-        setEditavel(false);
+      if (!token) {
+        Alert.alert("Erro", "Usuário não autenticado");
+        return;
       }
+
+      const response = await axios.get(
+        "http://localhost:8081/endereco/pegar-endereco",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      setEndereco(response.data);
+      setEditavel(false);
     } catch (error) {
-      console.error("Erro ao carregar endereço:", error);
-
-      // tenta carregar do AsyncStorage se o servidor falhar
-      const local = await AsyncStorage.getItem("endereco");
-      if (local) {
-        setEndereco(JSON.parse(local));
-        setEditavel(false);
-      }
+      console.error("Erro ao buscar endereço:", error);
+      Alert.alert("Erro", "Não foi possível carregar o endereço.");
     } finally {
       setLoading(false);
     }
@@ -69,12 +77,18 @@ export default function EnderecoScreen() {
   const salvarEndereco = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
-      await axios.put("http://localhost:8081/endereco/editar", endereco, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+
+      await axios.put(
+        "http://localhost:8081/endereco/editar",
+        endereco,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
       Alert.alert("Sucesso", "Endereço salvo com sucesso!");
-      await AsyncStorage.setItem("endereco", JSON.stringify(endereco));
       setEditavel(false);
+      carregarEndereco(); // recarrega do backend
     } catch (error) {
       console.error(error);
       Alert.alert("Erro", "Não foi possível salvar o endereço.");
@@ -84,13 +98,23 @@ export default function EnderecoScreen() {
   const excluirEndereco = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
-      await axios.delete("http://localhost:8081/endereco/excluir", {
-        headers: { Authorization: `Bearer ${token}` },
+
+      await axios.delete(
+        "http://localhost:8081/endereco/excluir",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      Alert.alert("Sucesso", "Endereço excluído!");
+      setEndereco({
+        rua: "",
+        numero: "",
+        bairro: "",
+        cidade: "",
+        estado: "",
+        cep: "",
       });
-      Alert.alert("Endereço excluído!");
-      const vazio = { rua: "", numero: "", bairro: "", cidade: "", estado: "", cep: "" };
-      setEndereco(vazio);
-      await AsyncStorage.setItem("endereco", JSON.stringify(vazio));
       setEditavel(true);
     } catch (error) {
       console.error(error);
@@ -109,7 +133,7 @@ export default function EnderecoScreen() {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <TouchableOpacity onPress={() => router.push("/(tabs)/perfil")}>
-        <Icon style={styles.icone} name="chevron-left" size={28} color="#000" />
+        <Icon style={styles.icone} name="chevron-left" size={28} />
       </TouchableOpacity>
 
       <Text style={styles.titulo}>Endereço de Entrega</Text>
@@ -117,46 +141,12 @@ export default function EnderecoScreen() {
       <Card containerStyle={styles.card}>
         {editavel ? (
           <>
-            <Input
-              label="Rua"
-              value={endereco.rua}
-              onChangeText={(t) => atualizarCampo("rua", t)}
-              placeholder="Ex.: Avenida Brasil"
-            />
-            <Input
-              label="Número"
-              value={endereco.numero}
-              onChangeText={(t) => atualizarCampo("numero", t)}
-              placeholder="123"
-              keyboardType="numeric"
-            />
-            <Input
-              label="Bairro"
-              value={endereco.bairro}
-              onChangeText={(t) => atualizarCampo("bairro", t)}
-              placeholder="Centro"
-            />
-            <Input
-              label="Cidade"
-              value={endereco.cidade}
-              onChangeText={(t) => atualizarCampo("cidade", t)}
-              placeholder="São Paulo"
-            />
-            <Input
-              label="Estado"
-              value={endereco.estado}
-              onChangeText={(t) => atualizarCampo("estado", t)}
-              placeholder="SP"
-              maxLength={2}
-            />
-            <Input
-              label="CEP"
-              value={endereco.cep}
-              onChangeText={(t) => atualizarCampo("cep", t)}
-              placeholder="00000-000"
-              maxLength={9}
-              keyboardType="numeric"
-            />
+            <Input label="Rua" value={endereco.rua} onChangeText={(t) => atualizarCampo("rua", t)} />
+            <Input label="Número" value={endereco.numero} onChangeText={(t) => atualizarCampo("numero", t)} keyboardType="numeric" />
+            <Input label="Bairro" value={endereco.bairro} onChangeText={(t) => atualizarCampo("bairro", t)} />
+            <Input label="Cidade" value={endereco.cidade} onChangeText={(t) => atualizarCampo("cidade", t)} />
+            <Input label="Estado" value={endereco.estado} onChangeText={(t) => atualizarCampo("estado", t)} maxLength={2} />
+            <Input label="CEP" value={endereco.cep} onChangeText={(t) => atualizarCampo("cep", t)} keyboardType="numeric" maxLength={9} />
           </>
         ) : (
           <View style={styles.visualizacao}>
@@ -206,7 +196,6 @@ const styles = StyleSheet.create({
   icone: {
     color: "#cc0000ff",
     marginRight: 4,
-    gap: 6,
   },
   titulo: {
     fontSize: 18,
