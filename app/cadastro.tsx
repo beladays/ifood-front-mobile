@@ -1,12 +1,61 @@
 import axios from 'axios';
 import { Link, useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import {ScrollView,StyleSheet,Text,TextInput,TouchableOpacity,View,KeyboardAvoidingView,Platform,} from 'react-native';
+import {
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { API_BASE_URL } from '../app/config';
 
+/* ================== HELPERS ================== */
+const onlyNumbers = (value: string) => value.replace(/\D/g, '');
 
-const onlyNumbers = (value: string) => value.replace(/\D/g, ''); 
+const maskCPF = (value: string) =>
+  value
+    .replace(/\D/g, '')
+    .replace(/(\d{3})(\d)/, '$1.$2')
+    .replace(/(\d{3})(\d)/, '$1.$2')
+    .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
 
+const maskPhone = (value: string) =>
+  value
+    .replace(/\D/g, '')
+    .replace(/(\d{2})(\d)/, '($1) $2')
+    .replace(/(\d{5})(\d)/, '$1-$2');
+
+const maskCEP = (value: string) =>
+  value.replace(/\D/g, '').replace(/(\d{5})(\d)/, '$1-$2');
+
+/* Digitação visual: yyyy/MM/dd */
+const maskDate = (value: string) =>
+  value
+    .replace(/\D/g, '')
+    .replace(/(\d{4})(\d)/, '$1/$2')
+    .replace(/(\d{2})(\d)/, '$1/$2')
+    .slice(0, 10);
+
+/* SEMPRE envia yyyy-MM-dd */
+function formatDateForBackend(data: string) {
+  if (!data) return '';
+
+  const partes = data.split('/');
+
+  if (partes[0].length === 4) {
+    const [ano, mes, dia] = partes;
+    return `${ano}-${mes}-${dia}`;
+  }
+
+  const [dia, mes, ano] = partes;
+  return `${ano}-${mes}-${dia}`;
+}
+
+/* ================== COMPONENT ================== */
 export default function Cadastro() {
   const router = useRouter();
 
@@ -26,9 +75,38 @@ export default function Cadastro() {
   const [estado, setEstado] = useState('');
   const [cep, setCep] = useState('');
 
+  /* ================== VIA CEP ================== */
+  async function buscarCep(valor: string) {
+    setCep(maskCEP(valor));
+    const cepNumeros = onlyNumbers(valor);
+
+    if (cepNumeros.length !== 8) return;
+
+    try {
+      const response = await axios.get(
+        `https://viacep.com.br/ws/${cepNumeros}/json/`
+      );
+
+      if (response.data.erro) {
+        setErro('CEP não encontrado');
+        return;
+      }
+
+      setRua(response.data.logradouro || '');
+      setBairro(response.data.bairro || '');
+      setCidade(response.data.localidade || '');
+      setEstado(response.data.uf || '');
+      setErro('');
+    } catch {
+      setErro('Erro ao buscar CEP');
+    }
+  }
+
+  /* ================== CADASTRAR ================== */
   async function cadastrar() {
     const cpfNumeros = onlyNumbers(cpf);
     const foneNumeros = onlyNumbers(foneCelular);
+    const cepNumeros = onlyNumbers(cep);
 
     if (
       !nome || !cpf || !email || !senha || !confirmarSenha ||
@@ -39,12 +117,15 @@ export default function Cadastro() {
     }
 
     if (!email.includes('@')) return setErro('Email inválido');
-    if (cpfNumeros.length !== 11) return setErro('CPF deve ter 11 dígitos');
+    if (cpfNumeros.length !== 11) return setErro('CPF inválido');
     if (foneNumeros.length !== 11) return setErro('Telefone inválido');
+    if (cepNumeros.length !== 8) return setErro('CEP inválido');
+    if (dtNascimento.length !== 10) return setErro('Data inválida');
     if (senha.length < 6) return setErro('Senha mínima de 6 caracteres');
     if (senha !== confirmarSenha) return setErro('As senhas devem ser iguais');
 
-    setErro('');
+    const dataISO = formatDateForBackend(dtNascimento);
+    console.log('DATA ENVIADA:', dataISO); // yyyy-MM-dd
 
     try {
       await axios.post(`${API_BASE_URL}/auth/registro`, {
@@ -52,7 +133,7 @@ export default function Cadastro() {
         cpf: cpfNumeros,
         email,
         password: senha,
-        dt_nascimento: dtNascimento,
+        dt_nascimento: dataISO,
         fone_celular: foneNumeros,
         endereco: {
           rua,
@@ -60,7 +141,7 @@ export default function Cadastro() {
           bairro,
           cidade,
           estado,
-          cep,
+          cep: cepNumeros,
         },
       });
 
@@ -71,6 +152,7 @@ export default function Cadastro() {
     }
   }
 
+  /* ================== UI ================== */
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
@@ -85,7 +167,6 @@ export default function Cadastro() {
         <View style={styles.container}>
           <Text style={styles.titulo}>Cadastro</Text>
 
-          {/* ===== DADOS PESSOAIS ===== */}
           <Text style={styles.subtitulo}>Dados pessoais</Text>
 
           <View style={styles.grid}>
@@ -99,8 +180,9 @@ export default function Cadastro() {
               <TextInput
                 style={styles.input}
                 value={cpf}
-                onChangeText={setCpf}
+                onChangeText={(t) => setCpf(maskCPF(t))}
                 keyboardType="numeric"
+                maxLength={14}
               />
             </View>
 
@@ -109,8 +191,9 @@ export default function Cadastro() {
               <TextInput
                 style={styles.input}
                 value={foneCelular}
-                onChangeText={setFoneCelular}
+                onChangeText={(t) => setFoneCelular(maskPhone(t))}
                 keyboardType="phone-pad"
+                maxLength={15}
               />
             </View>
 
@@ -129,9 +212,11 @@ export default function Cadastro() {
               <Text style={styles.label}>Nascimento</Text>
               <TextInput
                 style={styles.input}
-                placeholder="yyyy-MM-dd"
+                placeholder="yyyy/MM/dd"
                 value={dtNascimento}
-                onChangeText={setDtNascimento}
+                onChangeText={(t) => setDtNascimento(maskDate(t))}
+                keyboardType="numeric"
+                maxLength={10}
               />
             </View>
 
@@ -156,13 +241,12 @@ export default function Cadastro() {
             </View>
           </View>
 
-          {/* ===== ENDEREÇO ===== */}
           <Text style={styles.subtitulo}>Endereço</Text>
 
           <View style={styles.grid}>
             <View style={[styles.group, styles.full]}>
               <Text style={styles.label}>Rua</Text>
-              <TextInput style={styles.input} value={rua} onChangeText={setRua} />
+              <TextInput style={styles.input} value={rua} editable={false} />
             </View>
 
             <View style={styles.group}>
@@ -175,24 +259,25 @@ export default function Cadastro() {
               <TextInput
                 style={styles.input}
                 value={cep}
-                onChangeText={setCep}
+                onChangeText={buscarCep}
                 keyboardType="numeric"
+                maxLength={9}
               />
             </View>
 
             <View style={[styles.group, styles.full]}>
               <Text style={styles.label}>Bairro</Text>
-              <TextInput style={styles.input} value={bairro} onChangeText={setBairro} />
+              <TextInput style={styles.input} value={bairro} editable={false} />
             </View>
 
             <View style={[styles.group, styles.full]}>
               <Text style={styles.label}>Cidade</Text>
-              <TextInput style={styles.input} value={cidade} onChangeText={setCidade} />
+              <TextInput style={styles.input} value={cidade} editable={false} />
             </View>
 
             <View style={styles.group}>
               <Text style={styles.label}>Estado</Text>
-              <TextInput style={styles.input} value={estado} onChangeText={setEstado} />
+              <TextInput style={styles.input} value={estado} editable={false} />
             </View>
           </View>
 
@@ -211,7 +296,7 @@ export default function Cadastro() {
   );
 }
 
-/* css */
+/* ================== CSS ORIGINAL ================== */
 const styles = StyleSheet.create({
   page: {
     padding: 20,
