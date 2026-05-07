@@ -1,50 +1,160 @@
-# Welcome to your Expo app 👋
+# 🍔 iFood Front Mobile
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Aplicação mobile desenvolvida para simular uma plataforma de delivery inspirada no iFood, utilizando tecnologias modernas para construção de interfaces móveis intuitivas e responsivas.
 
-## Get started
+O projeto permite visualizar restaurantes, produtos e navegar entre telas de uma aplicação de delivery.
 
-1. Install dependencies
+---
 
-   ```bash
-   npm install
-   ```
+# 📌 Objetivo do Projeto
 
-2. Start the app
+Desenvolver uma aplicação mobile de delivery aplicando conceitos de:
 
-   ```bash
-   npx expo start
-   ```
+- Desenvolvimento mobile
+- Navegação entre telas
+- Consumo de APIs
+- Componentização
+- Interfaces responsivas
+- Experiência do usuário (UX)
 
-In the output, you'll find options to open the app in a
+---
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+# 🛠 Tecnologias Utilizadas
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+- React Native
+- Expo
+- JavaScript
+- Axios
+- React Navigation
 
-## Get a fresh project
+---
 
-When you're ready, run:
+# 🚀 Funcionalidades
 
-```bash
-npm run reset-project
+## ✅ Tela Inicial
+- Exibição de restaurantes e categorias
+- Interface inspirada em aplicativos de delivery
+
+---
+
+## ✅ Navegação entre Telas
+- Navegação utilizando React Navigation
+
+---
+
+## ✅ Listagem de Produtos
+- Exibição dinâmica de produtos e restaurantes
+
+---
+
+## ✅ Interface Responsiva
+- Compatível com diferentes dispositivos móveis
+
+---
+
+## ✅ Consumo de API
+- Integração com APIs para carregamento de dados
+
+---
+
+# 🏗 Arquitetura do Sistema
+
+```text
+Usuário
+   ↓
+Aplicação Mobile
+   ↓
+Componentes React Native
+   ↓
+Consumo de API
+   ↓
+Renderização dinâmica
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+---
 
-## Learn more
+# 📂 Estrutura do Projeto
 
-To learn more about developing your project with Expo, look at the following resources:
+```text
+ifood-front-mobile/
+│
+├── assets/
+│
+├── src/
+│   ├── screens/
+│   ├── components/
+│   ├── services/
+│   └── routes/
+│
+├── App.js
+├── package.json
+└── README.md
+```
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+---
 
-## Join the community
+# ⚙ Instalação do Projeto
 
-Join our community of developers creating universal apps.
+## 1️⃣ Clonar o repositório
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+```bash
+git clone https://github.com/beladays/ifood-front-mobile.git
+```
+
+---
+
+## 2️⃣ Acessar pasta do projeto
+
+```bash
+cd ifood-front-mobile
+```
+
+---
+
+## 3️⃣ Instalar dependências
+
+```bash
+npm install
+```
+
+---
+
+## 4️⃣ Executar aplicação
+
+```bash
+npm start
+```
+
+ou
+
+```bash
+expo start
+```
+
+---
+
+# 📱 Executando no Celular
+
+1. Instale o aplicativo **Expo Go** no celular
+2. Execute:
+
+```bash
+expo start
+```
+
+3. Escaneie o QR Code exibido no terminal/navegador
+
+---
+
+# 💻 Funcionalidades da Interface
+
+| Funcionalidade | Descrição |
+|---|---|
+| Home | Tela inicial da aplicação |
+| Restaurantes | Exibição de restaurantes |
+| Produtos | Listagem dinâmica |
+| Navegação | Troca de telas |
+| API | Consumo de dados externos |
+
+---
+
